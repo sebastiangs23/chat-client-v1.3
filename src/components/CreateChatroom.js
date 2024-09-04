@@ -32,9 +32,13 @@ const CreateChatroom = () => {
         }
 
         const responseData = await response.json();
+        console.log("responseData---->", responseData);
+
         const tableNames = responseData.result.data.filter(
           (table) => table !== "_User" && table !== "_Role" && table !== "_Session"
         );
+
+        console.log("tableNames---->", tableNames);
 
         const chatroomsWithLinks = await Promise.all(tableNames.map(async (tableName) => {
           const data = { tableName };
@@ -55,11 +59,14 @@ const CreateChatroom = () => {
             }
 
             const tableData = await tableResponse.json();
+            console.log("tableData---->", tableData);
+
             return {
               name: tableName,
               link: tableData.result.data.link,
             };
           } catch (error) {
+            console.error(`Error fetching link for table ${tableName}:`, error);
             return {
               name: tableName,
               link: "#",
@@ -78,9 +85,13 @@ const CreateChatroom = () => {
     socketRef.current = io("http://localhost:2337");
 
     socketRef.current.on("message", (msgData) => {
+      console.log("Received message data CreateChatroom:", msgData);
+
       const { username, message } = msgData;
       if (username && message) {
         setMessages((prevMessages) => [...prevMessages, { username, message }]);
+      } else {
+        console.error("Received incomplete message data:", msgData);
       }
     });
 
@@ -90,6 +101,7 @@ const CreateChatroom = () => {
   }, []);
 
   useEffect(() => {
+    console.log("Messages updated:", messages);
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
@@ -114,11 +126,20 @@ const CreateChatroom = () => {
       }
 
       const responseData = await response.json();
+      console.log("response createChatroom data--->", responseData);
+
       const { chatroomId, link, members, username } = responseData.result.data;
       setChatroomId(chatroomId);
       setModalVisible(true);
+      setUsername(username)
 
       socketRef.current.emit("join", chatroomId);
+
+      console.log("Chatroom ID:", chatroomId);
+      console.log("Link:", link);
+      console.log("Members:", members);
+      console.log("Username:", username);
+
     } catch (error) {
       console.error("Error creating chatroom:", error);
     }
@@ -126,7 +147,8 @@ const CreateChatroom = () => {
 
   const sendMessage = () => {
     if (message.trim() && socketRef.current && chatroomName) {
-      const finalUsername = username || "Tú";
+      const finalUsername = username;
+      console.log("finalUsername:", finalUsername);
       const msgData = {
         username: finalUsername,
         message: message.trim(),
@@ -134,9 +156,13 @@ const CreateChatroom = () => {
         chatroomName: chatroomName,
       };
 
+      console.log("msgData---->", msgData);
+
       socketRef.current.emit("message", msgData, chatroomId);
       setMessages((prevMessages) => [...prevMessages, { username: finalUsername, message: message.trim() }]);
       setMessage("");
+    } else {
+      console.log("Message not sent. Check conditions:", { message, chatroomName });
     }
   };
 
