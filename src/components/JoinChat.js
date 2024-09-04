@@ -1,40 +1,57 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate, useLocation,} from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import io from "socket.io-client";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Modal, Button } from "react-bootstrap";
+
+// Componente para mostrar la información del grupo
+const GroupInfoModal = ({ show, handleClose, groupName }) => {
+  return (
+    <Modal show={show} onHide={handleClose} centered>
+      <Modal.Header closeButton>
+        <Modal.Title>{groupName} - Información del Grupo</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <p>Aquí puedes poner detalles sobre el grupo como:</p>
+        <ul>
+          <li>Descripción del grupo</li>
+          <li>Miembros del grupo</li>
+          <li>Configuraciones del grupo</li>
+        </ul>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleClose}>
+          Cerrar
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
 
 const JoinChat = () => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [username, setUsername] = useState("");
   const [chatroomId, setChatroomId] = useState("");
-  const [chatroomName, setChatroomName] = useState(""); // Agregado para manejar el nombre
+  const [chatroomName, setChatroomName] = useState("");
+  const [showGroupInfo, setShowGroupInfo] = useState(false);
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-        // Recuperar el nombre de usuario desde sessionStorage
-        const storedUsername = sessionStorage.getItem("username");
-        console.log(sessionStorage.getItem("username"));
-        
-        if (storedUsername) {
-          setUsername(storedUsername);
-        } else {
-          console.error("No username found in sessionStorage");
-        }
+    // Recuperar el nombre de usuario desde sessionStorage
+    const storedUsername = sessionStorage.getItem("username");
+    if (storedUsername) {
+      setUsername(storedUsername);
+    } else {
+      console.error("No username found in sessionStorage");
+    }
 
     const params = new URLSearchParams(location.search);
-    console.log("params--->", params);
-
     const id = params.get("chatroomId");
-    console.log("id--->", id);
-
-    const username = params.get("username");
-    console.log("username--->", username);
-
-    const name = params.get("chatroomName"); // Obtener el nombre de la sala si está disponible
-    console.log("name--->", name);
+    const name = params.get("chatroomName");
 
     if (!id) {
       alert("Chatroom ID missing");
@@ -42,13 +59,13 @@ const JoinChat = () => {
       return;
     }
     setChatroomId(id);
-    setChatroomName(name || ""); // Establecer el nombre de la sala si está disponible
+    setChatroomName(name || "");
 
     const fetchMessages = async () => {
       try {
         const data = {
           tableName: name,
-        };  
+        };
         const response = await fetch("http://localhost:2337/server/functions/getAllMessages", {
           method: "POST",
           headers: {
@@ -58,22 +75,20 @@ const JoinChat = () => {
           },
           body: JSON.stringify(data),
         });
-  
+
         if (!response.ok) {
           throw new Error(`Error fetching messages: ${response.statusText}`);
-        }  
+        }
         const result = await response.json();
-    // Accede a los mensajes dentro de result.result.data
-    if (result.result && result.result.status === "success") {
-      const formattedMessages = result.result.data[0].map((message) => ({
-        username: username, // Asume que los mensajes antiguos son del usuario actual
-        message: message,
-      }));
-      setMessages(formattedMessages); // Accede al array de mensajes directamente
-    } else {
-      console.error("Unexpected response structure:", result);
-    }  // Asumiendo que los mensajes se encuentran en result.data
-  
+        if (result.result && result.result.status === "success") {
+          const formattedMessages = result.result.data[0].map((message) => ({
+            username: username,
+            message: message,
+          }));
+          setMessages(formattedMessages);
+        } else {
+          console.error("Unexpected response structure:", result);
+        }
       } catch (error) {
         console.error("Error fetching messages:", error);
       }
@@ -85,12 +100,9 @@ const JoinChat = () => {
       console.log("Connected to the socket server");
     });
 
-    // Emitir un evento para unirse a la sala de chat
     socketRef.current.emit("join", chatroomId);
 
-    // Escuchar los mensajes entrantes
     socketRef.current.on("message", (msgData) => {
-      console.log("Received message data:", msgData);
       const { username, message } = msgData;
       if (username && message) {
         setMessages((prevMessages) => [...prevMessages, { username, message }]);
@@ -99,8 +111,7 @@ const JoinChat = () => {
       }
     });
 
-      // Llamar a la función para obtener los mensajes guardados al unirse a la sala
-  fetchMessages();
+    fetchMessages();
 
     return () => {
       socketRef.current.disconnect();
@@ -108,7 +119,6 @@ const JoinChat = () => {
   }, [chatroomId, location, navigate]);
 
   useEffect(() => {
-    console.log("Messages updated:", messages);
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
@@ -117,13 +127,11 @@ const JoinChat = () => {
   const sendMessage = () => {
     if (message.trim() && socketRef.current && chatroomName) {
       const msgData = {
-        username: username, // Reemplaza con el nombre de usuario real
+        username: username,
         message: message.trim(),
         chatroomId: chatroomId,
-        chatroomName: chatroomName, // Enviar el nombre de la sala
+        chatroomName: chatroomName,
       };
-      console.log("msgData---->", msgData);
-
       socketRef.current.emit("message", msgData, chatroomId);
       setMessage("");
     } else {
@@ -135,25 +143,78 @@ const JoinChat = () => {
   };
 
   return (
-    <div className="chat-container">
-      <h2>Chatroom: {chatroomName}</h2>
-      <div className="chat-messages">
+    <div
+      className="container mt-3 d-flex flex-column"
+      style={{
+        height: "90vh",
+        maxWidth: "600px",
+        margin: "0 auto",
+        border: "1px solid #ccc",
+        borderRadius: "10px",
+      }}
+    >
+      <div
+        className="bg-primary text-white p-3 rounded-top text-center"
+        style={{ cursor: "pointer" }}
+        onClick={() => setShowGroupInfo(true)}
+      >
+        <h5 className="mb-0">{chatroomName}</h5>
+      </div>
+      <div
+        className="flex-grow-1 p-3"
+        style={{
+          overflowY: "auto",
+          backgroundColor: "#f5f5f5",
+          borderBottom: "1px solid #ccc",
+        }}
+      >
         {messages.map((msg, index) => (
-          <div key={index}>
-            <strong>{msg.username}: </strong> {msg.message}
+          <div
+            key={index}
+            className={`d-flex mb-2 ${
+              msg.username === username
+                ? "justify-content-end"
+                : "justify-content-start"
+            }`}
+          >
+            <div
+              className={`p-2 rounded-3 ${
+                msg.username === username
+                  ? "bg-primary text-white"
+                  : "bg-light text-dark"
+              }`}
+              style={{ maxWidth: "75%", wordBreak: "break-word" }}
+            >
+              <strong>{msg.username === username ? "Tú" : msg.username}</strong>
+              <p className="mb-0">{msg.message}</p>
+            </div>
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
-      <div className="message-input">
+      <div className="p-3 d-flex align-items-center">
         <input
           type="text"
+          className="form-control me-2"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type a message..."
+          placeholder="Escribe un mensaje..."
+          style={{ borderRadius: "20px" }}
         />
-        <button onClick={sendMessage}>Send</button>
+        <button
+          className="btn btn-primary"
+          onClick={sendMessage}
+          style={{ borderRadius: "20px" }}
+        >
+          Enviar
+        </button>
       </div>
+
+      <GroupInfoModal
+        show={showGroupInfo}
+        handleClose={() => setShowGroupInfo(false)}
+        groupName={chatroomName}
+      />
     </div>
   );
 };
