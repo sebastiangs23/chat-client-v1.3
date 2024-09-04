@@ -9,7 +9,7 @@ const App = () => {
     <Router>
       <Routes>
         <Route path="/join-chat" element={<JoinChat />} />
-        <Route path="/" element={<CreateChatroom />} />
+        <Route path="/create-chatroom" element={<CreateChatroom />} />
         <Route path="/login" element={<Login />} />
       </Routes>
     </Router>
