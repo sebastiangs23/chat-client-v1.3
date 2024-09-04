@@ -1,18 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  useNavigate,
-  useLocation,
-  Routes,
-} from "react-router-dom";
+import { useNavigate, useLocation,} from "react-router-dom";
 import io from "socket.io-client";
-
 
 const JoinChat = () => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
-  const [username, setUsername] = useState("Tú");
+  const [username, setUsername] = useState("");
   const [chatroomId, setChatroomId] = useState("");
   const [chatroomName, setChatroomName] = useState(""); // Agregado para manejar el nombre
   const socketRef = useRef(null);
@@ -21,11 +14,24 @@ const JoinChat = () => {
   const location = useLocation();
 
   useEffect(() => {
+        // Recuperar el nombre de usuario desde sessionStorage
+        const storedUsername = sessionStorage.getItem("username");
+        console.log(sessionStorage.getItem("username"));
+        
+        if (storedUsername) {
+          setUsername(storedUsername);
+        } else {
+          console.error("No username found in sessionStorage");
+        }
+
     const params = new URLSearchParams(location.search);
     console.log("params--->", params);
-    
+
     const id = params.get("chatroomId");
     console.log("id--->", id);
+
+    const username = params.get("username");
+    console.log("username--->", username);
 
     const name = params.get("chatroomName"); // Obtener el nombre de la sala si está disponible
     console.log("name--->", name);
@@ -37,6 +43,41 @@ const JoinChat = () => {
     }
     setChatroomId(id);
     setChatroomName(name || ""); // Establecer el nombre de la sala si está disponible
+
+    const fetchMessages = async () => {
+      try {
+        const data = {
+          tableName: name,
+        };  
+        const response = await fetch("http://localhost:2337/server/functions/getAllMessages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Parse-Application-Id": "000",
+            "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
+          },
+          body: JSON.stringify(data),
+        });
+  
+        if (!response.ok) {
+          throw new Error(`Error fetching messages: ${response.statusText}`);
+        }  
+        const result = await response.json();
+    // Accede a los mensajes dentro de result.result.data
+    if (result.result && result.result.status === "success") {
+      const formattedMessages = result.result.data[0].map((message) => ({
+        username: username, // Asume que los mensajes antiguos son del usuario actual
+        message: message,
+      }));
+      setMessages(formattedMessages); // Accede al array de mensajes directamente
+    } else {
+      console.error("Unexpected response structure:", result);
+    }  // Asumiendo que los mensajes se encuentran en result.data
+  
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    };
 
     socketRef.current = io("http://localhost:2337");
 
@@ -57,6 +98,9 @@ const JoinChat = () => {
         console.error("Received incomplete message data:", msgData);
       }
     });
+
+      // Llamar a la función para obtener los mensajes guardados al unirse a la sala
+  fetchMessages();
 
     return () => {
       socketRef.current.disconnect();
@@ -79,11 +123,14 @@ const JoinChat = () => {
         chatroomName: chatroomName, // Enviar el nombre de la sala
       };
       console.log("msgData---->", msgData);
-      
+
       socketRef.current.emit("message", msgData, chatroomId);
       setMessage("");
-    }  else {
-      console.log("Message not sent. Check conditions:", { message, chatroomName });
+    } else {
+      console.log("Message not sent. Check conditions:", {
+        message,
+        chatroomName,
+      });
     }
   };
 
@@ -110,6 +157,5 @@ const JoinChat = () => {
     </div>
   );
 };
-
 
 export default JoinChat;

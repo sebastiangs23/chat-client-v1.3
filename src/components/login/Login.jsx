@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 export function Login() {
     const navigate = useNavigate();
-    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
   useEffect(() => {
@@ -13,7 +13,7 @@ export function Login() {
   async function signIn() {
     try {
       let data = {
-        username: email,
+        username: username,
         password: password,
       };
 
@@ -36,10 +36,13 @@ export function Login() {
 
       sessionStorage.setItem("idUser", result.objectId);
       sessionStorage.setItem("sessionToken", result.sesssionToken);
+      sessionStorage.setItem("username", result.username); // Almacenar el nombre de usuario
+      console.log("Setting username in sessionStorage:", result.username);
+
 
       if(result.objectId){
         alert('Se logeo con exito')
-        navigate("/join-chat")
+        navigate("/create-chatroom")
       }else {
         alert('No se quien eres ');
       }
@@ -50,7 +53,7 @@ export function Login() {
   }
 
   function handleChangeEmail(e){
-    setEmail(e.target.value)
+    setUsername(e.target.value)
   }
 
   function handleChangePassword(e){

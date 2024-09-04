@@ -136,6 +136,7 @@ const CreateChatroom = () => {
       const { chatroomId, link, members, username } = responseData.result.data;
       setChatroomId(chatroomId);
       setModalVisible(true);
+      setUsername(username)
 
       socketRef.current.emit("join", chatroomId);
 
@@ -150,7 +151,7 @@ const CreateChatroom = () => {
 
   const sendMessage = () => {
     if (message.trim() && socketRef.current && chatroomName) {
-      const finalUsername = username || "Tú";
+      const finalUsername = username;
 
       const msgData = {
         username: finalUsername,
