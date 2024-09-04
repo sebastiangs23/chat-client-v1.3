@@ -14,7 +14,7 @@ const JoinChat = () => {
   const [message, setMessage] = useState("");
   const [username, setUsername] = useState("Tú");
   const [chatroomId, setChatroomId] = useState("");
-  const [chatroomName, setChatroomName] = useState("");
+  const [chatroomName, setChatroomName] = useState(""); // Agregado para manejar el nombre
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
