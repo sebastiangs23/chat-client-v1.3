@@ -28,6 +28,39 @@ const GroupInfoModal = ({ show, handleClose, groupName }) => {
   );
 };
 
+const UsernameModal = ({ show, handleClose, handleSaveUsername }) => {
+  const [inputUsername, setInputUsername] = useState("");
+
+  const handleSave = () => {
+    if (inputUsername.trim()) {
+      handleSaveUsername(inputUsername);
+      handleClose();
+    }
+  };
+
+  return (
+    <Modal show={show} onHide={handleClose} centered>
+      <Modal.Header closeButton>
+        <Modal.Title>Introduce tu nombre de usuario</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Escribe tu nombre de usuario"
+          value={inputUsername}
+          onChange={(e) => setInputUsername(e.target.value)}
+        />
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="primary" onClick={handleSave}>
+          Guardar
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
+
 const JoinChat = () => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
@@ -35,6 +68,7 @@ const JoinChat = () => {
   const [chatroomId, setChatroomId] = useState("");
   const [chatroomName, setChatroomName] = useState("");
   const [showGroupInfo, setShowGroupInfo] = useState(false);
+  const [showUsernameModal, setShowUsernameModal] = useState(false);
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
@@ -46,7 +80,7 @@ const JoinChat = () => {
     if (storedUsername) {
       setUsername(storedUsername);
     } else {
-      console.error("No username found in sessionStorage");
+      setShowUsernameModal(true);
     }
 
     const params = new URLSearchParams(location.search);
@@ -66,15 +100,19 @@ const JoinChat = () => {
         const data = {
           tableName: name,
         };
-        const response = await fetch("http://localhost:2337/server/functions/getAllMessages", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Parse-Application-Id": "000",
-            "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
-          },
-          body: JSON.stringify(data),
-        });
+        const response = await fetch(
+          "http://localhost:2337/server/functions/getAllMessages",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Parse-Application-Id": "000",
+              "X-Parse-REST-API-Key":
+                "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
+            },
+            body: JSON.stringify(data),
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Error fetching messages: ${response.statusText}`);
@@ -103,6 +141,7 @@ const JoinChat = () => {
     socketRef.current.emit("join", chatroomId);
 
     socketRef.current.on("message", (msgData) => {
+      console.log("Received message data:", msgData);
       const { username, message } = msgData;
       if (username && message) {
         setMessages((prevMessages) => [...prevMessages, { username, message }]);
@@ -119,6 +158,7 @@ const JoinChat = () => {
   }, [chatroomId, location, navigate]);
 
   useEffect(() => {
+    console.log("Messages updated:", messages);
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
@@ -132,6 +172,8 @@ const JoinChat = () => {
         chatroomId: chatroomId,
         chatroomName: chatroomName,
       };
+      console.log("msgData---->", msgData);
+      
       socketRef.current.emit("message", msgData, chatroomId);
       setMessage("");
     } else {
@@ -140,6 +182,11 @@ const JoinChat = () => {
         chatroomName,
       });
     }
+  };
+
+  const handleSaveUsername = (newUsername) => {
+    setUsername(newUsername);
+    sessionStorage.setItem("username", newUsername);
   };
 
   return (
@@ -214,6 +261,12 @@ const JoinChat = () => {
         show={showGroupInfo}
         handleClose={() => setShowGroupInfo(false)}
         groupName={chatroomName}
+      />
+
+      <UsernameModal
+        show={showUsernameModal}
+        handleClose={() => setShowUsernameModal(false)}
+        handleSaveUsername={handleSaveUsername}
       />
     </div>
   );
