@@ -139,6 +139,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { BrowserRouter as Router, Route, useNavigate, useLocation, Routes } from "react-router-dom";
+import { Login } from "./components/login/Login";
 import io from "socket.io-client";
 import "./App.css";
 
@@ -398,6 +399,7 @@ const App = () => {
       <Routes>
         <Route path="/join-chat" element={<JoinChat />} />
         <Route path="/" element={<CreateChatroom />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </Router>
   );
