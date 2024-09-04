@@ -7,6 +7,7 @@ import {
   Routes,
 } from "react-router-dom";
 import io from "socket.io-client";
+import { Login } from "./components/login/Login";
 import "./App.css";
 
 const JoinChat = () => {
@@ -355,6 +356,7 @@ const App = () => {
       <Routes>
         <Route path="/join-chat" element={<JoinChat />} />
         <Route path="/" element={<CreateChatroom />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </Router>
   );

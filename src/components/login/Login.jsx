@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export function Login() {
-
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -38,6 +39,7 @@ export function Login() {
 
       if(result.objectId){
         alert('Se logeo con exito')
+        navigate("/join-chat")
       }else {
         alert('No se quien eres ');
       }
