@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import io from "socket.io-client";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Modal, Button } from "react-bootstrap";
+import ChatDuo from "./ChatDuo.js";
 
 // Componente para mostrar la información del grupo
 const GroupInfoModal = ({ show, handleClose, groupName }) => {
@@ -35,6 +36,7 @@ const JoinChat = () => {
   const [chatroomId, setChatroomId] = useState("");
   const [chatroomName, setChatroomName] = useState("");
   const [showGroupInfo, setShowGroupInfo] = useState(false);
+  const [userSelected, setUserSelected] = useState(null);
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
@@ -66,20 +68,25 @@ const JoinChat = () => {
         const data = {
           tableName: name,
         };
-        const response = await fetch("http://localhost:2337/server/functions/getAllMessages", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Parse-Application-Id": "000",
-            "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
-          },
-          body: JSON.stringify(data),
-        });
+        const response = await fetch(
+          "http://localhost:2337/server/functions/getAllMessages",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Parse-Application-Id": "000",
+              "X-Parse-REST-API-Key":
+                "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
+            },
+            body: JSON.stringify(data),
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Error fetching messages: ${response.statusText}`);
         }
         const result = await response.json();
+        console.log("aver que llega", result);
         if (result.result && result.result.status === "success") {
           const formattedMessages = result.result.data[0].map((message) => ({
             username: username,
@@ -142,79 +149,99 @@ const JoinChat = () => {
     }
   };
 
-  return (
-    <div
-      className="container mt-3 d-flex flex-column"
-      style={{
-        height: "90vh",
-        maxWidth: "600px",
-        margin: "0 auto",
-        border: "1px solid #ccc",
-        borderRadius: "10px",
-      }}
-    >
-      <div
-        className="bg-primary text-white p-3 rounded-top text-center"
-        style={{ cursor: "pointer" }}
-        onClick={() => setShowGroupInfo(true)}
-      >
-        <h5 className="mb-0">{chatroomName}</h5>
-      </div>
-      <div
-        className="flex-grow-1 p-3"
-        style={{
-          overflowY: "auto",
-          backgroundColor: "#f5f5f5",
-          borderBottom: "1px solid #ccc",
-        }}
-      >
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`d-flex mb-2 ${
-              msg.username === username
-                ? "justify-content-end"
-                : "justify-content-start"
-            }`}
-          >
-            <div
-              className={`p-2 rounded-3 ${
-                msg.username === username
-                  ? "bg-primary text-white"
-                  : "bg-light text-dark"
-              }`}
-              style={{ maxWidth: "75%", wordBreak: "break-word" }}
-            >
-              <strong>{msg.username === username ? "Tú" : msg.username}</strong>
-              <p className="mb-0">{msg.message}</p>
-            </div>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-      <div className="p-3 d-flex align-items-center">
-        <input
-          type="text"
-          className="form-control me-2"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Escribe un mensaje..."
-          style={{ borderRadius: "20px" }}
-        />
-        <button
-          className="btn btn-primary"
-          onClick={sendMessage}
-          style={{ borderRadius: "20px" }}
-        >
-          Enviar
-        </button>
-      </div>
+  function openDuoChat(user) {
+    //Aca tengo que adaptarlo cuando para que solo me seleccione el idUser
+    setUserSelected(user);
+    console.log(user);
+  }
 
-      <GroupInfoModal
-        show={showGroupInfo}
-        handleClose={() => setShowGroupInfo(false)}
-        groupName={chatroomName}
-      />
+  return (
+    <div className="container">
+      <div className="d-flex justify-content-between">
+        <div
+          className="container mt-3 d-flex flex-column"
+          style={{
+            height: "90vh",
+            maxWidth: "600px",
+            margin: "0 auto",
+            border: "1px solid #ccc",
+            borderRadius: "10px",
+          }}
+        >
+          <div
+            className="bg-primary text-white p-3 rounded-top text-center"
+            style={{ cursor: "pointer" }}
+            onClick={() => setShowGroupInfo(true)}
+          >
+            <h5 className="mb-0">{chatroomName}</h5>
+          </div>
+          <div
+            className="flex-grow-1 p-3"
+            style={{
+              overflowY: "auto",
+              backgroundColor: "#f5f5f5",
+              borderBottom: "1px solid #ccc",
+            }}
+          >
+            {messages.map((msg, index) => (
+              <div
+                key={index}
+                className={`d-flex mb-2 ${
+                  msg.username === username
+                    ? "justify-content-end"
+                    : "justify-content-start"
+                }`}
+              >
+                <div
+                  className={`p-2 rounded-3 ${
+                    msg.username === username
+                      ? "bg-primary text-white"
+                      : "bg-light text-dark"
+                  }`}
+                  style={{ maxWidth: "75%", wordBreak: "break-word" }}
+                >
+                  <strong onClick={() => openDuoChat(msg)}>
+                    {msg.username === username ? "Tú" : msg.username}
+                  </strong>
+                  <p className="mb-0">{msg.message}</p>
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+          <div className="p-3 d-flex align-items-center">
+            <input
+              type="text"
+              className="form-control me-2"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Escribe un mensaje..."
+              style={{ borderRadius: "20px" }}
+            />
+            <button
+              className="btn btn-primary"
+              onClick={sendMessage}
+              style={{ borderRadius: "20px" }}
+            >
+              Enviar
+            </button>
+          </div>
+
+          <GroupInfoModal
+            show={showGroupInfo}
+            handleClose={() => setShowGroupInfo(false)}
+            groupName={chatroomName}
+          />
+        </div>
+
+        <div className="container mt-3" style={{ maxWidth: "600px" }}>
+          {userSelected != null ? (
+            <ChatDuo user={userSelected} />
+          ) : (
+            <h2>No chat duo aun</h2>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
