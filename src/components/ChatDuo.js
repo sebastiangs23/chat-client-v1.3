@@ -51,11 +51,11 @@ const ChatDuo = ({ user }) => {
     }
 
     createOrFindDuoRoom();
-  }, []); 
+  }, []);
 
   // Este useEffect se ejecuta cuando `chatroomId` tiene un valor
   useEffect(() => {
-    if (!roomId) return; 
+    if (!roomId) return;
 
     const fetchMessagesAndSubscribe = async () => {
       try {
@@ -75,7 +75,7 @@ const ChatDuo = ({ user }) => {
               createdAt: message.get("createdAt"),
             }));
 
-          setAllMessages(messagesHistory); 
+          setAllMessages(messagesHistory);
         }
 
         // Aquí es donde configuramos la suscripción a Parse LiveQuery
@@ -106,7 +106,7 @@ const ChatDuo = ({ user }) => {
         subscriptionMessageRef.current.unsubscribe();
       }
     };
-  }, [roomId]); 
+  }, [roomId]);
 
   async function sendMessage() {
     const ChatMessage = Parse.Object.extend("chatMessage");
@@ -126,18 +126,17 @@ const ChatDuo = ({ user }) => {
       <div
         className="container mt-3 d-flex flex-column"
         style={{
-          height: "90vh",
-          maxWidth: "600px",
-          margin: "0 auto",
-          border: "1px solid #ccc",
-          borderRadius: "10px",
+          width: "600px",
+          height: "630px",
+          backgroundColor: "#f5f5f5",
+          borderBottom: "1px solid #ccc",
         }}
       >
         <div
           className="bg-primary text-white p-3 rounded-top text-center"
           style={{ cursor: "pointer" }}
         >
-          <h5 className="mb-0">Estas hablando con: {user.username}</h5>
+          <h5 className="mb-0">Chat Duo: {user.username}</h5>
         </div>
         <div
           className="flex-grow-1 p-3"
