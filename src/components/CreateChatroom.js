@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
-import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Chat.css";
 
@@ -14,7 +13,6 @@ const CreateChatroom = () => {
   const [chatrooms, setChatrooms] = useState([]);
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTables = async () => {
@@ -34,10 +32,13 @@ const CreateChatroom = () => {
         }
 
         const responseData = await response.json();
+        console.log("responseData:", responseData);
 
         const tableNames = responseData.result.data.filter(
           (table) => table !== "_User" && table !== "_Role" && table !== "_Session"
         );
+
+        console.log("tableNames:", tableNames);
 
         const chatroomsWithLinks = await Promise.all(tableNames.map(async (tableName) => {
           const data = { tableName };
@@ -58,11 +59,11 @@ const CreateChatroom = () => {
             }
 
             const tableData = await tableResponse.json();
-            const link = tableData.result?.data?.link || "#";
+            console.log("tableData:", tableData);
 
             return {
               name: tableName,
-              link: link,
+              link: tableData.result?.data?.link || "#",
             };
           } catch (error) {
             console.error(`Error fetching link for table ${tableName}:`, error);
@@ -84,6 +85,8 @@ const CreateChatroom = () => {
     socketRef.current = io("http://localhost:2337");
 
     socketRef.current.on("message", (msgData) => {
+      console.log("Received message data:", msgData);
+
       const { username, message } = msgData;
       if (username && message) {
         setMessages((prevMessages) => [...prevMessages, { username, message }]);
@@ -98,6 +101,7 @@ const CreateChatroom = () => {
   }, []);
 
   useEffect(() => {
+    console.log("Messages updated:", messages);
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
@@ -112,7 +116,7 @@ const CreateChatroom = () => {
           "Content-Type": "application/json",
           "X-Parse-Application-Id": "000",
           "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
-          "X-Parse-Session-Token": "r:d221a041e069b119330d9822a2781724",
+          "X-Parse-Session-Token": "r:ef7df36bf16e16d8b9c4e3d6665f5dba",
         },
         body: JSON.stringify(data),
       });
@@ -122,15 +126,20 @@ const CreateChatroom = () => {
       }
 
       const responseData = await response.json();
-      const { chatroomId, username } = responseData.result.data;
+      console.log("Chatroom creation response:", responseData);
+
+      const { chatroomId, link, members, username } = responseData.result.data;
       setChatroomId(chatroomId);
       setModalVisible(true);
       setUsername(username);
 
       socketRef.current.emit("join", chatroomId);
 
-      // Redirecciona a la ruta del chatroom
-      navigate(`/join-chat/${chatroomId}`);
+      console.log("Chatroom ID:", chatroomId);
+      console.log("Link:", link);
+      console.log("Members:", members);
+      console.log("Username:", username);
+
     } catch (error) {
       console.error("Error creating chatroom:", error);
     }
@@ -144,31 +153,38 @@ const CreateChatroom = () => {
         chatroomId,
       };
 
+      console.log("Sending message:", msgData);
+
       socketRef.current.emit("message", msgData);
       setMessages((prevMessages) => [...prevMessages, { username, message: message.trim() }]);
       setMessage("");
+    } else {
+      console.log("Message not sent. Check conditions:", { message, chatroomId });
     }
   };
 
   return (
     <div className="container mt-4">
-      <div className="chatrooms-sidebar">
-        <div className="input-group mb-3">
-          <input
-            type="text"
-            className="form-control"
-            value={chatroomName}
-            onChange={(e) => setChatroomName(e.target.value)}
-            placeholder="Enter chatroom name"
-          />
-          <button className="btn btn-primary btn-sm" onClick={createChatroom}>Create Chat</button>
-        </div>
+      <h1 className="mb-4">Create a Chatroom Group</h1>
+      <div className="mb-3">
+        <input
+          type="text"
+          className="form-control"
+          value={chatroomName}
+          onChange={(e) => setChatroomName(e.target.value)}
+          placeholder="Enter chatroom name"
+        />
+      </div>
+      <button className="btn btn-primary mb-4" onClick={createChatroom}>Create Chatroom</button>
+
+      <div className="chatrooms-container">
+        <h2>Available Chatrooms</h2>
         <div className="list-group">
           {chatrooms.map((chatroom, index) => (
             <div key={index} className="list-group-item list-group-item-action d-flex align-items-center">
               <div className="me-3">
                 <img
-                  src="https://via.placeholder.com/50"
+                  src="https://via.placeholder.com/50" // Placeholder for chatroom icon
                   alt="Chatroom Icon"
                   className="rounded-circle"
                 />
@@ -189,40 +205,38 @@ const CreateChatroom = () => {
         </div>
       </div>
 
-      <div className="flex-grow-1 d-flex flex-column">
-        {modalVisible && (
-          <div className="modal show" style={{ display: 'block' }}>
-            <div className="modal-dialog modal-dialog-centered">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">Chatroom: {chatroomName}</h5>
-                  <button type="button" className="btn-close" onClick={() => setModalVisible(false)}></button>
+      {modalVisible && (
+        <div className="modal show" style={{ display: 'block' }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Chatroom: {chatroomName}</h5>
+                <button type="button" className="btn-close" onClick={() => setModalVisible(false)}></button>
+              </div>
+              <div className="modal-body">
+                <div className="chat-messages mb-3" style={{ maxHeight: '300px', overflowY: 'scroll' }}>
+                  {messages.map((msg, index) => (
+                    <div key={index}>
+                      <strong>{msg.username}:</strong> {msg.message}
+                    </div>
+                  ))}
+                  <div ref={messagesEndRef} />
                 </div>
-                <div className="modal-body d-flex flex-column">
-                  <div className="chat-messages mb-3">
-                    {messages.map((msg, index) => (
-                      <div key={index}>
-                        <strong>{msg.username}: </strong>{msg.message}
-                      </div>
-                    ))}
-                    <div ref={messagesEndRef} />
-                  </div>
-                  <div className="input-group">
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      placeholder="Type your message"
-                    />
-                    <button className="btn btn-primary btn-sm" onClick={sendMessage}>Send</button>
-                  </div>
+                <div className="input-group">
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Type a message..."
+                  />
+                  <button className="btn btn-primary" onClick={sendMessage}>Send</button>
                 </div>
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
