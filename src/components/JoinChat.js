@@ -94,6 +94,7 @@ const JoinChat = () => {
       navigate("/");
       return;
     }
+    
     setChatroomId(id);
     setChatroomName(name || "");
 
@@ -120,11 +121,11 @@ const JoinChat = () => {
           throw new Error(`Error fetching messages: ${response.statusText}`);
         }
         const result = await response.json();
-        console.log("aver que llega", result);
+        
         if (result.result && result.result.status === "success") {
           const formattedMessages = result.result.data[0].map((message) => ({
-            username: username,
-            message: message,
+            username: message.username,
+            message: message.content,
           }));
           setMessages(formattedMessages);
         } else {
@@ -147,7 +148,7 @@ const JoinChat = () => {
       console.log("Received message data:", msgData);
       const { username, message } = msgData;
       if (username && message) {
-        setMessages((prevMessages) => [...prevMessages, { username, message }]);
+        setMessages((prevMessages) => [...prevMessages, { id_user: "asda", username, message } ]);
       } else {
         console.error("Received incomplete message data:", msgData);
       }
