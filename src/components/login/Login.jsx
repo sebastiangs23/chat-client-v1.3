@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../../context/UserContext";
 
 export function Login({ onLogin }) {
   const navigate = useNavigate();
+  const { loginUser } = useUser(); // Usamos el contexto para actualizar el estado global
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -24,15 +26,12 @@ export function Login({ onLogin }) {
 
       let result = await response.json();
 
-      if (result.objectId) {
-        sessionStorage.setItem("idUser", result.objectId);
-        sessionStorage.setItem("sessionToken", result.sessionToken);
-        sessionStorage.setItem("username", result.username);
-
-        onLogin(); // Actualiza el estado de autenticación en App
-        navigate("/create-chatroom"); // Redirige al usuario a la página principal después de iniciar sesión
+      if (result && result.sessionToken) {
+        // Guardamos el username y el token en el contexto
+        loginUser({ username: result.username, sessionToken: result.sessionToken });
+        navigate("/create-chatroom"); // Redirigimos al crear chatroom
       } else {
-        alert('Credenciales incorrectas');
+        alert("Credenciales incorrectas");
       }
     } catch (error) {
       console.log(error);
@@ -44,7 +43,7 @@ export function Login({ onLogin }) {
       <h1>LOGIN</h1>
       <div>
         <div>
-          <h2>Correo</h2>
+          <h2>Usuario</h2>
           <input type="text" onChange={(e) => setUsername(e.target.value)} />
         </div>
         <div>

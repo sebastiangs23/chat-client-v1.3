@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useUser } from "../context/UserContext.js";
 import io from "socket.io-client";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Modal, Button } from "react-bootstrap";
@@ -29,40 +30,8 @@ const GroupInfoModal = ({ show, handleClose, groupName }) => {
   );
 };
 
-const UsernameModal = ({ show, handleClose, handleSaveUsername }) => {
-  const [inputUsername, setInputUsername] = useState("");
-
-  const handleSave = () => {
-    if (inputUsername.trim()) {
-      handleSaveUsername(inputUsername);
-      handleClose();
-    }
-  };
-
-  return (
-    <Modal show={show} onHide={handleClose} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>Introduce tu nombre de usuario</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Escribe tu nombre de usuario"
-          value={inputUsername}
-          onChange={(e) => setInputUsername(e.target.value)}
-        />
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="primary" onClick={handleSave}>
-          Guardar
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-
 const JoinChat = () => {
+  const { user } = useUser();
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [username, setUsername] = useState("");
@@ -70,21 +39,22 @@ const JoinChat = () => {
   const [chatroomName, setChatroomName] = useState("");
   const [showGroupInfo, setShowGroupInfo] = useState(false);
   const [userSelected, setUserSelected] = useState(null);
-  const [showUsernameModal, setShowUsernameModal] = useState(false);
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-
+  
+  
   useEffect(() => {
-    // Recuperar el nombre de usuario desde sessionStorage
-    const storedUsername = sessionStorage.getItem("username");
-    if (storedUsername) {
-      setUsername(storedUsername);
+    if(user){
+      console.log("user Join Chat--->", user); 
+      console.log("username Join Chat--->", user.username);    
+      console.log("sessionToken Join Chat--->", user.sessionToken);
+      setUsername(user.username);
     } else {
-      setShowUsernameModal(true);
+      console.warn("User is not defined or username is missing");
     }
-
+    
     const params = new URLSearchParams(location.search);
     const id = params.get("chatroomId");
     const name = params.get("chatroomName");
@@ -100,9 +70,7 @@ const JoinChat = () => {
 
     const fetchMessages = async () => {
       try {
-        const data = {
-          tableName: name,
-        };
+        const data = { tableName: name };
         const response = await fetch(
           "http://localhost:2337/server/functions/getAllMessages",
           {
@@ -110,8 +78,7 @@ const JoinChat = () => {
             headers: {
               "Content-Type": "application/json",
               "X-Parse-Application-Id": "000",
-              "X-Parse-REST-API-Key":
-                "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
+              "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
             },
             body: JSON.stringify(data),
           }
@@ -120,49 +87,48 @@ const JoinChat = () => {
         if (!response.ok) {
           throw new Error(`Error fetching messages: ${response.statusText}`);
         }
+
         const result = await response.json();
-        
-        if (result.result && result.result.status === "success") {
-          const formattedMessages = result.result.data[0].map((message) => ({
-            username: message.username,
-            message: message.content,
+        if (result && result.result.status === "success" && Array.isArray(result.result.data)) {
+          const formattedMessages = result.result.data.map((messageObject) => ({
+            username: messageObject.username,
+            message: messageObject.message,
           }));
-          setMessages(formattedMessages);
-        } else {
-          console.error("Unexpected response structure:", result);
+          setMessages(formattedMessages); 
         }
       } catch (error) {
         console.error("Error fetching messages:", error);
       }
     };
 
-    socketRef.current = io("http://localhost:2337");
-
-    socketRef.current.on("connect", () => {
-      console.log("Connected to the socket server");
-    });
-
-    socketRef.current.emit("join", chatroomId);
-
-    socketRef.current.on("message", (msgData) => {
-      console.log("Received message data:", msgData);
-      const { username, message } = msgData;
-      if (username && message) {
-        setMessages((prevMessages) => [...prevMessages, { id_user: "asda", username, message } ]);
-      } else {
-        console.error("Received incomplete message data:", msgData);
-      }
-    });
-
     fetchMessages();
 
+    if (!socketRef.current) {
+      socketRef.current = io("http://localhost:2337");
+      
+      socketRef.current.on("connect", () => {
+        console.log("Connected to the socket server");
+        socketRef.current.emit("join", id);
+      });
+
+      socketRef.current.on("message", (msgData) => {
+        console.log("Received message data Join Chat--->:", msgData);
+        const { username, message } = msgData;
+        if (username && message) {
+          setMessages((prevMessages) => [...prevMessages, { username, message }]);
+        }
+      });
+    }
+
     return () => {
-      socketRef.current.disconnect();
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
     };
-  }, [chatroomId, location, navigate]);
+  }, [chatroomId, location, navigate, chatroomName, user]);
 
   useEffect(() => {
-    console.log("Messages updated:", messages);
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
@@ -171,33 +137,27 @@ const JoinChat = () => {
   const sendMessage = () => {
     if (message.trim() && socketRef.current && chatroomName) {
       const msgData = {
-        username: username,
+        username,
         message: message.trim(),
         chatroomId: chatroomId,
         chatroomName: chatroomName,
       };
-      console.log("msgData---->", msgData);
 
-      socketRef.current.emit("message", msgData, chatroomId);
+      console.log("username emit---->", username)
+
+      socketRef.current.emit("message", msgData);
       setMessage("");
-    } else {
-      console.log("Message not sent. Check conditions:", {
-        message,
-        chatroomName,
-      });
     }
   };
 
-  const handleSaveUsername = (newUsername) => {
-    setUsername(newUsername);
-    sessionStorage.setItem("username", newUsername);
-  };
+  // const handleSaveUsername = (newUsername) => {
+  //   setUsername(newUsername);
+  //   sessionStorage.setItem("username", newUsername);
+  // };
 
-  function openDuoChat(user) {
-    //Aca tengo que adaptarlo cuando para que solo me seleccione el idUser
+  const openDuoChat = (user) => {
     setUserSelected(user);
-    console.log(user);
-  }
+  };
 
   return (
     <div className="container d-flex" style={{ padding: 0 }}>
@@ -276,24 +236,13 @@ const JoinChat = () => {
           handleClose={() => setShowGroupInfo(false)}
           groupName={chatroomName}
         />
-
-        <UsernameModal
-          show={showUsernameModal}
-          handleClose={() => setShowUsernameModal(false)}
-          handleSaveUsername={handleSaveUsername}
-        />
       </div>
 
-      <div
-        className="container mt-3 d-flex justify-content-end"
-        style={{ width: "600px" }}
-      >
-        {userSelected != null ? (
-          <ChatDuo user={userSelected} />
-        ) : (
-          <h2>No chat duo aun</h2>
-        )}
-      </div>
+      {userSelected && (
+        <div className="container" style={{ width: "700px", marginLeft: "10px" }}>
+          <ChatDuo userSelected={userSelected} chatroomId={chatroomId} />
+        </div>
+      )}
     </div>
   );
 };
