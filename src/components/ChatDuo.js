@@ -1,11 +1,13 @@
 import { useEffect, useState, useRef } from "react";
 import Parse from "parse";
+import { useUser } from "../context/UserContext";
 
 Parse.initialize("000");
 Parse.serverURL = "http://localhost:2337/server";
-const sessionToken = "r:220a7f6a212a581d7d9401fd6446330c";
+// const sessionToken = "r:220a7f6a212a581d7d9401fd6446330c";
 
-const ChatDuo = ({ user }) => {
+const ChatDuo = ({ userProps }) => {
+  const { user } = useUser();
   const [newMessage, setNewMessage] = useState([]);
   const [allMessages, setAllMessages] = useState([]);
   const [roomId, setRoomId] = useState("");
@@ -16,13 +18,21 @@ const ChatDuo = ({ user }) => {
 
   // Este useEffect crea o encuentra la sala
   useEffect(() => {
-    const initializeChatRoom = async () => {
-      console.log("lo que me llega", user);
+    const userSessionStorage = localStorage.getItem("user");
+    const sessionToken = localStorage.getItem("sessionToken");
+    console.log(JSON.stringify(userSessionStorage.username));
+    console.log('sessionToken',  sessionToken);
 
-      let user1 = await findUserByName(user.username);
+    const initializeChatRoom = async () => {
+      console.log("lo que me llega", userProps);
+
+      let user1 = await findUserByName(userProps.username);
       setUserSelected(user1);
 
       const user2 = await findUserByName(sessionStorage.getItem("username"));
+
+      console.log("assdsad", user2)
+
       setUserLogged(user2);
 
       createOrFindDuoRoom();
@@ -179,7 +189,7 @@ const ChatDuo = ({ user }) => {
           className="bg-primary text-white p-3 rounded-top text-center"
           style={{ cursor: "pointer" }}
         >
-          <h5 className="mb-0">Chat Duo: {user.username}</h5>
+          <h5 className="mb-0">Chat Duo: {userProps ? userProps.username : ""}</h5>
         </div>
         <div
           className="flex-grow-1 p-3"
@@ -204,7 +214,7 @@ const ChatDuo = ({ user }) => {
                   }`}
                   style={{ maxWidth: "75%", wordBreak: "break-word" }}
                 >
-                  <strong>  {userLogged == msg.clientId ? 'Tú' : user.username}: </strong>
+                  {/* <strong>  {userLogged == msg.clientId ? 'Tú' : user.username}: </strong> */}
                   <p className="mb-0">{msg.content}</p>
                 </div>
               </div>

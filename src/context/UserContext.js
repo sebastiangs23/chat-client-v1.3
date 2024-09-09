@@ -8,6 +8,7 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null); // Aquí se almacena el username y sessionToken
 
   const loginUser = (userData) => {
+    console.log('cuando se logea', userData)
     setUser(userData);
   };
 

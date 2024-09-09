@@ -156,6 +156,7 @@ const JoinChat = () => {
   // };
 
   const openDuoChat = (user) => {
+    console.log('el elejido :',  user);
     setUserSelected(user);
   };
 
@@ -240,7 +241,7 @@ const JoinChat = () => {
 
       {userSelected && (
         <div className="container" style={{ width: "700px", marginLeft: "10px" }}>
-          <ChatDuo userSelected={userSelected} chatroomId={chatroomId} />
+          <ChatDuo userProps={userSelected} chatroomId={chatroomId} />
         </div>
       )}
     </div>
