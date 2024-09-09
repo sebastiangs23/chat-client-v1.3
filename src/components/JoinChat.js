@@ -7,21 +7,71 @@ import { Modal, Button } from "react-bootstrap";
 import ChatDuo from "./ChatDuo.js";
 
 // Componente para mostrar la información del grupo
-const GroupInfoModal = ({ show, handleClose, groupName }) => {
+const GroupInfoModal = ({ show, handleClose, groupName, chatroomId }) => {
+  const [groupLink, setGroupLink] = useState(null);
+
+  useEffect(() => {
+    const fetchGroupLink = async () => {
+      try {
+        const data = { tableName: groupName }; // Aquí debes enviar el tableName
+
+        const response = await fetch(
+          "http://localhost:2337/server/functions/getTableLink",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Parse-Application-Id": "000",
+              "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
+            },
+            body: JSON.stringify(data),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error fetching group link: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        if (result && result.result.status === "success") {
+          setGroupLink(result.result.data.link); // Asigna el link obtenido
+        }
+      } catch (error) {
+        console.error("Error fetching group link:", error);
+      }
+    };
+
+    if (show) {
+      fetchGroupLink(); // Llama a la función cuando el modal se abre
+    }
+  }, [show, groupName]);
+
   return (
     <Modal show={show} onHide={handleClose} centered>
       <Modal.Header closeButton>
-        <Modal.Title>{groupName} - Información del Grupo</Modal.Title>
+        <Modal.Title className="text-center w-100">{groupName} - Información del Grupo</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>Aquí puedes poner detalles sobre el grupo como:</p>
-        <ul>
-          <li>Descripción del grupo</li>
-          <li>Miembros del grupo</li>
-          <li>Configuraciones del grupo</li>
-        </ul>
+        <div className="container">
+          <p className="text-muted">Detalles del grupo:</p>
+          <ul className="list-group">
+            <li className="list-group-item">
+              <strong>Nombre del grupo: </strong>{groupName}
+            </li>
+            <li className="list-group-item">
+              <strong>Link para unirse: </strong>
+              {groupLink ? (
+                <a href={groupLink} target="_blank" rel="noopener noreferrer" className="text-primary">
+                  {groupLink}
+                </a>
+              ) : (
+                "Cargando link..."
+              )}
+            </li>
+          </ul>
+        </div>
       </Modal.Body>
-      <Modal.Footer>
+      <Modal.Footer className="d-flex justify-content-center">
         <Button variant="secondary" onClick={handleClose}>
           Cerrar
         </Button>
