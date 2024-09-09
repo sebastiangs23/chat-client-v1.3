@@ -1,4 +1,4 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useEffect  } from "react";
 
 // Crea el contexto
 const UserContext = createContext();
@@ -7,11 +7,21 @@ const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null); // Aquí se almacena el username y sessionToken
 
+    // Restaura el usuario desde sessionStorage cuando la aplicación se carga
+    useEffect(() => {
+      const storedUser = sessionStorage.getItem("user");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+    }, []);
+
   const loginUser = (userData) => {
+    sessionStorage.setItem('user', JSON.stringify(userData)); // Asegúrate de guardar el usuario en sessionStorage
     setUser(userData);
   };
 
   const logoutUser = () => {
+    sessionStorage.removeItem("user"); // Elimina el usuario de sessionStorage al cerrar sesión
     setUser(null);
   };
 

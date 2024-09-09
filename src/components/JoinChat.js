@@ -46,14 +46,19 @@ const JoinChat = () => {
   
   
   useEffect(() => {
-    if(user){
-      console.log("user Join Chat--->", user); 
-      console.log("username Join Chat--->", user.username);    
-      console.log("sessionToken Join Chat--->", user.sessionToken);
-      setUsername(user.username);
-    } else {
-      console.warn("User is not defined or username is missing");
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+      console.log("storedUsername Join Chat--->", storedUsername);
+      setUsername(storedUsername);
     }
+    const handleStorageChange = (event) => {
+      if (event.key === "username") {
+        setUsername(event.newValue);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
     
     const params = new URLSearchParams(location.search);
     const id = params.get("chatroomId");
@@ -149,11 +154,6 @@ const JoinChat = () => {
       setMessage("");
     }
   };
-
-  // const handleSaveUsername = (newUsername) => {
-  //   setUsername(newUsername);
-  //   sessionStorage.setItem("username", newUsername);
-  // };
 
   const openDuoChat = (user) => {
     setUserSelected(user);
