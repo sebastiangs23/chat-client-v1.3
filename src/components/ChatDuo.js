@@ -7,7 +7,6 @@ Parse.serverURL = "http://localhost:2337/server";
 // const sessionToken = "r:220a7f6a212a581d7d9401fd6446330c";
 
 const ChatDuo = ({ userProps }) => {
-  const { user } = useUser();
   const [newMessage, setNewMessage] = useState([]);
   const [allMessages, setAllMessages] = useState([]);
   const [roomId, setRoomId] = useState("");
@@ -18,21 +17,14 @@ const ChatDuo = ({ userProps }) => {
 
   // Este useEffect crea o encuentra la sala
   useEffect(() => {
-    const userSessionStorage = localStorage.getItem("user");
-    const sessionToken = localStorage.getItem("sessionToken");
-    console.log(JSON.stringify(userSessionStorage.username));
-    console.log('sessionToken',  sessionToken);
-
     const initializeChatRoom = async () => {
-      console.log("lo que me llega", userProps);
-
       let user1 = await findUserByName(userProps.username);
       setUserSelected(user1);
 
-      const user2 = await findUserByName(sessionStorage.getItem("username"));
-
-      console.log("assdsad", user2)
-
+      const storedUser = localStorage.getItem("user");
+      const userParsed = JSON.parse(storedUser);
+      
+      const user2 = await findUserByName(userParsed.username);
       setUserLogged(user2);
 
       createOrFindDuoRoom();
@@ -80,7 +72,7 @@ const ChatDuo = ({ userProps }) => {
 
           // Actualizamos el estado con el nuevo mensaje
           setAllMessages((prevMessages) => [...prevMessages, newMsg]);
-          setNewMessage((prevState) => [...prevState, newMsg]);
+          // setNewMessage((prevState) => [...prevState, newMsg]);
         });
       } catch (error) {
         console.log("Error al obtener los mensajes o suscribirse:", error);
@@ -214,7 +206,7 @@ const ChatDuo = ({ userProps }) => {
                   }`}
                   style={{ maxWidth: "75%", wordBreak: "break-word" }}
                 >
-                  {/* <strong>  {userLogged == msg.clientId ? 'Tú' : user.username}: </strong> */}
+                  <strong>  {userLogged == msg.clientId ? 'Tú' : userProps.username}: </strong>
                   <p className="mb-0">{msg.content}</p>
                 </div>
               </div>

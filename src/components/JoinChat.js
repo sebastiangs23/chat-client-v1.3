@@ -47,7 +47,7 @@ const JoinChat = () => {
   
   useEffect(() => {
     const storedUsername = localStorage.getItem("user");
-    const userParsed = JSON.parse(storedUsername) 
+    const userParsed = JSON.parse(storedUsername);
 
     if (storedUsername) {
       console.log("storedUsername Join Chat--->", userParsed.username);
@@ -159,6 +159,7 @@ const JoinChat = () => {
   };
 
   const openDuoChat = (user) => {
+    console.log( user)
     setUserSelected(user);
   };
 
