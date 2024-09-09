@@ -46,22 +46,39 @@ export function Login() {
   }
 
   return (
-    <div>
-      <h1>LOGIN</h1>
-      <div>
-        <div>
-          <h2>Usuario</h2>
-          <input type="text" onChange={(e) => setUsername(e.target.value)} />
-        </div>
-        <div>
-          <h2>Contraseña</h2>
-          <input
-            type="password"
-            onChange={(e) => setPassword(e.target.value)}
-          />
+    <div class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-md-4">
+          <h1 class="text-center mb-4">LOGIN</h1>
+          <div class="mb-3">
+            <label for="username" class="form-label h5">
+              Usuario
+            </label>
+            <input
+              type="text"
+              id="username"
+              class="form-control"
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Ingresa tu usuario"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label h5">
+              Contraseña
+            </label>
+            <input
+              type="password"
+              id="password"
+              class="form-control"
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Ingresa tu contraseña"
+            />
+          </div>
+          <button class="btn btn-primary w-100" onClick={signIn}>
+            INGRESAR
+          </button>
         </div>
       </div>
-      <button onClick={signIn}>INGRESAR</button>
     </div>
   );
 }
