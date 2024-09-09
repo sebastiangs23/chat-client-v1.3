@@ -46,14 +46,21 @@ const JoinChat = () => {
   
   
   useEffect(() => {
-    if(user){
-      console.log("user Join Chat--->", user); 
-      console.log("username Join Chat--->", user.username);    
-      console.log("sessionToken Join Chat--->", user.sessionToken);
-      setUsername(user.username);
-    } else {
-      console.warn("User is not defined or username is missing");
+    const storedUsername = localStorage.getItem("user");
+    const userParsed = JSON.parse(storedUsername) 
+
+    if (storedUsername) {
+      console.log("storedUsername Join Chat--->", userParsed.username);
+      setUsername(userParsed.username);
     }
+    const handleStorageChange = (event) => {
+      if (event.key === "username") {
+        setUsername(event.newValue);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
     
     const params = new URLSearchParams(location.search);
     const id = params.get("chatroomId");
@@ -137,26 +144,21 @@ const JoinChat = () => {
   const sendMessage = () => {
     if (message.trim() && socketRef.current && chatroomName) {
       const msgData = {
-        username,
+        username: username,
         message: message.trim(),
         chatroomId: chatroomId,
         chatroomName: chatroomName,
       };
 
-      console.log("username emit---->", username)
+      console.log("user", user);
+      
 
       socketRef.current.emit("message", msgData);
       setMessage("");
     }
   };
 
-  // const handleSaveUsername = (newUsername) => {
-  //   setUsername(newUsername);
-  //   sessionStorage.setItem("username", newUsername);
-  // };
-
   const openDuoChat = (user) => {
-    console.log('el elejido :',  user);
     setUserSelected(user);
   };
 
@@ -243,7 +245,7 @@ const JoinChat = () => {
         <div className="container" style={{ width: "700px", marginLeft: "10px" }}>
           <ChatDuo userProps={userSelected} chatroomId={chatroomId} />
         </div>
-      )}
+      )} 
     </div>
   );
 };

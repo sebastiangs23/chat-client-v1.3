@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useUser } from "../context/UserContext";
+import { useNavigate } from "react-router-dom"; // Importa useNavigate
 import io from "socket.io-client";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Chat.css";
 
 const CreateChatroom = () => {
   const { user } = useUser();
+  const navigate = useNavigate(); // Usa useNavigate para redirigir
   const [chatroomName, setChatroomName] = useState("");
   const [chatroomId, setChatroomId] = useState(null);
   const [chatVisible, setChatVisible] = useState(false);

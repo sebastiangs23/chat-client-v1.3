@@ -7,7 +7,6 @@ import {
 } from "react-router-dom";
 import JoinChat from "./components/JoinChat";
 import CreateChatroom from "./components/CreateChatroom";
-//import {CreateChatroom, JoinChat} from "./components/CreateChatroom";
 import { Login } from "./components/login/Login";
 import { UserProvider, useUser } from "./context/UserContext";
 

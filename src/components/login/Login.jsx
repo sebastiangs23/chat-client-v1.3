@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
 
-export function Login({ onLogin }) {
+export function Login() {
   const navigate = useNavigate();
   const { loginUser } = useUser(); // Usamos el contexto para actualizar el estado global
   const [username, setUsername] = useState("");
@@ -18,6 +18,7 @@ export function Login({ onLogin }) {
       const response = await fetch(`http://localhost:2337/server/login`, {
         method: "POST",
         headers: {
+          "Content-Type": "application/json",
           "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
           "X-Parse-Application-Id": "000",
         },
@@ -28,7 +29,13 @@ export function Login({ onLogin }) {
 
       if (result && result.sessionToken) {
         // Guardamos el username y el token en el contexto
-        loginUser({ username: result.username, sessionToken: result.sessionToken });
+        const userData = {
+          username: result.username,
+          sessionToken: result.sessionToken,
+        };
+        loginUser(userData);
+        // También guardamos los datos en sessionStorage para persistencia
+        localStorage.setItem("user", JSON.stringify(userData));
         navigate("/create-chatroom"); // Redirigimos al crear chatroom
       } else {
         alert("Credenciales incorrectas");
@@ -48,7 +55,10 @@ export function Login({ onLogin }) {
         </div>
         <div>
           <h2>Contraseña</h2>
-          <input type="password" onChange={(e) => setPassword(e.target.value)} />
+          <input
+            type="password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </div>
       </div>
       <button onClick={signIn}>INGRESAR</button>
