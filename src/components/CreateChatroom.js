@@ -194,7 +194,7 @@ const CreateChatroom = () => {
 
   return (
     <div className="container-fluid mt-4">
-      <h1 className="mb-2">Create a Chatroom Group</h1>
+      <h1 className="mb-2">Comunidades</h1>
       <div className="col-md-3 mb-2">
         <input
           type="text"
@@ -205,14 +205,14 @@ const CreateChatroom = () => {
         />
       </div>
       <button className="btn btn-primary mb-4" onClick={createChatroom}>
-        Create Chatroom
+        Crear comunidad
       </button>
 
       <div className="row">
         {/* Sección de chatrooms disponibles */}
         <div className="col-md-3">
           <div className="chatrooms-container">
-            <h2>Available Chatrooms</h2>
+            <h2>Comunidades Disponibles</h2>
             <div className="list-group">
               {chatrooms.map((chatroom, index) => (
                 <div
