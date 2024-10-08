@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from "react";
+import axios from "axios"
 import Parse from "parse";
-import { useUser } from "../context/UserContext";
 
-Parse.initialize("000");
+Parse.initialize("077");
 Parse.serverURL = "http://localhost:2337/server";
 // const sessionToken = "r:220a7f6a212a581d7d9401fd6446330c";
 
@@ -10,7 +10,6 @@ const ChatDuo = ({ userProps }) => {
   const [newMessage, setNewMessage] = useState([]);
   const [allMessages, setAllMessages] = useState([]);
   const [roomId, setRoomId] = useState("");
-  const [userSelected, setUserSelected] = useState("");
   const [userLogged, setUserLogged] = useState("");
 
   const subscriptionMessageRef = useRef(null);
@@ -18,17 +17,11 @@ const ChatDuo = ({ userProps }) => {
   // Este useEffect crea o encuentra la sala
   useEffect(() => {
     const initializeChatRoom = async () => {
-      let user1 = await findUserByName(userProps.username);
-      console.log('user1: ', user1);
-      
-      setUserSelected(user1);
 
-      const storedUser = localStorage.getItem("user");
-      console.log('storedUser:', storedUser);
-      
-      const userParsed = JSON.parse(storedUser);
-      
-      const user2 = await findUserByName(userParsed.username);
+      const user1 = "gqQfIsKm1F";
+      const user2 = "hEFCcRgbmz";
+
+      console.log('user1: ', user1);
       console.log('user2 ', user2);
       
       setUserLogged(user2);
@@ -93,6 +86,16 @@ const ChatDuo = ({ userProps }) => {
       }
     };
   }, [roomId]);
+
+  async function getAllusers(){
+    try {
+        const response = await axios.post(`http://localhost:2337/server/functions/getAllUsers`);
+
+
+    } catch (error) {
+        console.log(error);
+    }
+  }
 
   async function createOrFindDuoRoom(user1, user2) {
     try {
