@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from "react";
-import axios from "axios"
 import Parse from "parse";
 
 Parse.initialize("077");
@@ -87,16 +86,6 @@ const ChatDuo = ({ userProps }) => {
     };
   }, [roomId]);
 
-  async function getAllusers(){
-    try {
-        const response = await axios.post(`http://localhost:2337/server/functions/getAllUsers`);
-
-
-    } catch (error) {
-        console.log(error);
-    }
-  }
-
   async function createOrFindDuoRoom(user1, user2) {
     try {
       let members = [user1, user2];
@@ -127,6 +116,8 @@ const ChatDuo = ({ userProps }) => {
       const chatroomId = result.result.data.chatroom.objectId;
 
       // Aquí seteamos el roomId una vez que lo obtengamos
+      console.log('chatroomdId' , chatroomId);
+      
       setRoomId(chatroomId);
     } catch (error) {
       console.log("Error creando o encontrando la sala:", error);

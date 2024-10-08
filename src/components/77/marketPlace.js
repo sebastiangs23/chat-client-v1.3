@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
+import ChatDuo from "./chatDuo";
 
 export function MarketPlace() {
   const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     getAllUsers();
@@ -32,8 +34,11 @@ export function MarketPlace() {
     }
   }
 
-  function openChat(){
-    console.log('aqui esta mi logica');
+  function openChat(id) {
+    setSelectedUser(id);
+    console.log("id", id);
+
+    console.log("aqui esta mi logica");
   }
 
   return (
@@ -44,16 +49,22 @@ export function MarketPlace() {
       >
         <h5 className="p-3">Usuarios</h5>
         <ul className="list-group list-group-flush">
-          {users && users.map((user, index) => (
-            <li key={index} className="list-group-item" onClick={openChat} >
-              {user.username}
-            </li>
-          ))}
+          {users &&
+            users.map((user, index) => (
+              <li
+                key={index}
+                className="list-group-item"
+                onClick={() => openChat(user.objectId)}
+              >
+                {user.username}
+              </li>
+            ))}
         </ul>
       </div>
       <div className="flex-grow-1 p-3">
-
         <h1>Bienvenido al MarketPlace</h1>
+
+        {selectedUser != null ? <ChatDuo /> : <h2>Seleccion un usuario</h2>}
       </div>
     </div>
   );
