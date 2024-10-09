@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import Parse from "parse";
 
+// Parse.initialize("077");
 Parse.initialize("077");
 Parse.serverURL = "http://localhost:2337/server";
 // const sessionToken = "r:220a7f6a212a581d7d9401fd6446330c";
@@ -16,13 +17,20 @@ const ChatDuo = ({ userProps }) => {
   // Este useEffect crea o encuentra la sala
   useEffect(() => {
     const initializeChatRoom = async () => {
+      const user1 = "Odp8QLsRKf"; //test
+      const user2 = "AJuqmfGuBZ"; //test2
 
-      const user1 = "gqQfIsKm1F";
-      const user2 = "hEFCcRgbmz";
+      console.log("user1: ", user1);
+      console.log("user2 ", user2);
 
-      console.log('user1: ', user1);
-      console.log('user2 ', user2);
+      // const user1 = await findUserByName(userProps.username);
+      // const storedUser = localStorage.getItem("user");
+      // const userParsed = JSON.parse(storedUser);
+      // const user2 = await findUserByName(userParsed.username);
+
+      // console.log('users: ', user1, user2);
       
+
       setUserLogged(user2);
 
       createOrFindDuoRoom(user1, user2);
@@ -98,6 +106,9 @@ const ChatDuo = ({ userProps }) => {
         objectData,
       };
 
+      console.log('este data?', data);
+      
+
       // Crea o encuentra la sala
       const response = await fetch(
         `http://localhost:2337/server/functions/createChatroom`,
@@ -105,8 +116,8 @@ const ChatDuo = ({ userProps }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Parse-Application-Id": "000",
-            "X-Parse-REST-API-Key": "r:06673cb764f52af0f7221e15945e6376", // hacerlo dinámico
+            "X-Parse-Application-Id": "077",
+            "X-Parse-REST-API-Key": "r:75f28041082ed88222a781007d97607d", // hacerlo dinámico
           },
           body: JSON.stringify(data),
         }
@@ -116,8 +127,8 @@ const ChatDuo = ({ userProps }) => {
       const chatroomId = result.result.data.chatroom.objectId;
 
       // Aquí seteamos el roomId una vez que lo obtengamos
-      console.log('chatroomdId' , chatroomId);
-      
+      console.log("chatroomdId", chatroomId);
+
       setRoomId(chatroomId);
     } catch (error) {
       console.log("Error creando o encontrando la sala:", error);
@@ -154,16 +165,20 @@ const ChatDuo = ({ userProps }) => {
   }
 
   async function sendMessage() {
-    const ChatMessage = Parse.Object.extend("chatMessage");
-    const message = new ChatMessage();
+    try {
+      const ChatMessage = Parse.Object.extend("chatMessage");
+      const message = new ChatMessage();
 
-    message.set("content", newMessage);
-    message.set("clientId", userLogged);
-    message.set("chatroomId", roomId);
-    message.save().catch((error) => {
-      console.log("Error al enviar mensaje: ", error);
-    });
-    setNewMessage("");
+      message.set("content", newMessage);
+      message.set("clientId", userLogged);
+      message.set("chatroomId", roomId);
+      message.save().catch((error) => {
+        console.log("Error al enviar mensaje: ", error);
+      });
+      setNewMessage("");
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -181,7 +196,9 @@ const ChatDuo = ({ userProps }) => {
           className="bg-primary text-white p-3 rounded-top text-center"
           style={{ cursor: "pointer" }}
         >
-          <h5 className="mb-0">Chat Duo: {userProps ? userProps.username : ""}</h5>
+          <h5 className="mb-0">
+            Chat Duo: {userProps ? userProps.username : ""}
+          </h5>
         </div>
         <div
           className="flex-grow-1 p-3"
@@ -193,11 +210,14 @@ const ChatDuo = ({ userProps }) => {
         >
           {allMessages &&
             allMessages.map((msg, index) => (
-              <div key={index} className={`d-flex mb-2 ${
-                msg.clientId === userLogged
-                  ? "justify-content-end"
-                  : "justify-content-start"
-              }`} >
+              <div
+                key={index}
+                className={`d-flex mb-2 ${
+                  msg.clientId === userLogged
+                    ? "justify-content-end"
+                    : "justify-content-start"
+                }`}
+              >
                 <div
                   className={`p-2 rounded-3 ${
                     msg.clientId === userLogged
@@ -206,7 +226,12 @@ const ChatDuo = ({ userProps }) => {
                   }`}
                   style={{ maxWidth: "75%", wordBreak: "break-word" }}
                 >
-                  <strong>  {userLogged == msg.clientId ? 'Tú' : userProps.username}: </strong>
+                  <strong>
+                    {" "}
+                    {userLogged == msg.clientId
+                      ? "Tú"
+                      : userProps.username}:{" "}
+                  </strong>
                   <p className="mb-0">{msg.content}</p>
                 </div>
               </div>

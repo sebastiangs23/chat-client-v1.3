@@ -13,22 +13,71 @@ export function MarketPlace() {
 
   async function getAllUsers() {
     try {
-      const response = await axios.post(
-        `http://localhost:2337/server/functions/getAllUsers`,
-        {
-          page: 1,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "X-Parse-Application-Id": "000",
-            "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
-          },
-        }
-      );
+      // const response = await axios.post(
+      //   `http://localhost:2337/server/functions/getAllUsers`,
+      //   {
+      //     page: 1,
+      //   },
+      //   {
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       "X-Parse-Application-Id": "000",
+      //       "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
+      //     },
+      //   }
+      // );
 
-      console.log("los usuarios", response.data.result.users.users);
-      setUsers(response.data.result.users.users);
+      // console.log("los usuarios", response.data.result.users.users);
+      // setUsers(response.data.result.users.users);
+
+      let response = [
+        {
+          objectId : "94c56DabuS",
+          username : "sebass",
+          _hashed_password : "$2y$10$obM66PXjDc9n2dVXddx4nub/T8kzCRbwYHOjfqS6kGFOvH3uYs5W2",
+          _wperm : [
+              "94c56DabuS"
+          ],
+          user_chatrooms : [
+              {
+                  chatroomId : "JO4p3ny7MM",
+                  members : [
+                      "94c56DabuS",
+                      "gqQfIsKm1F"
+                  ]
+              },
+              {
+                  chatroomId : "tjqRBq8x7s",
+                  members : [
+                      "94c56DabuS",
+                      "gqQfIsKm1F"
+                  ]
+              }
+          ]
+      },
+      {
+          objectId : "gqQfIsKm1F",
+          username : "testeo",
+          user_chatrooms : [
+              {
+                  chatroomId : "5F24Vdso8A",
+                  members : [
+                      "gqQfIsKm1F",
+                      "hEFCcRgbmz"
+                  ]
+              },
+              {
+                  "chatroomId" : "i0yxQeYrnW",
+                  "members" : [
+                      "gqQfIsKm1F",
+                      "hEFCcRgbmz"
+                  ]
+              },
+          ]
+      }
+      ]
+
+      setUsers(response);
     } catch (error) {
       console.log(error);
     }

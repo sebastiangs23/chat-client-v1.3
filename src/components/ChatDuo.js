@@ -19,18 +19,12 @@ const ChatDuo = ({ userProps }) => {
   useEffect(() => {
     const initializeChatRoom = async () => {
       let user1 = await findUserByName(userProps.username);
-      console.log('user1: ', user1);
-      
       setUserSelected(user1);
 
       const storedUser = localStorage.getItem("user");
-      console.log('storedUser:', storedUser);
-      
       const userParsed = JSON.parse(storedUser);
-      
+
       const user2 = await findUserByName(userParsed.username);
-      console.log('user2 ', user2);
-      
       setUserLogged(user2);
 
       createOrFindDuoRoom(user1, user2);
@@ -45,12 +39,18 @@ const ChatDuo = ({ userProps }) => {
 
     const fetchMessagesAndSubscribe = async () => {
       try {
+
+        console.log('roomId --> ', roomId);
+        
         // Crear una conexión con la colección "Chat_Message"
         const ChatMessage = Parse.Object.extend("chatMessage");
         const query = new Parse.Query(ChatMessage);
         query.equalTo("chatroomId", roomId);
 
         const data = await query.find();
+
+        console.log('data: ', data);
+        
         if (data) {
           const messagesHistory = data
             .filter((message) => message.get("content") !== "")
@@ -78,7 +78,6 @@ const ChatDuo = ({ userProps }) => {
 
           // Actualizamos el estado con el nuevo mensaje
           setAllMessages((prevMessages) => [...prevMessages, newMsg]);
-          // setNewMessage((prevState) => [...prevState, newMsg]);
         });
       } catch (error) {
         console.log("Error al obtener los mensajes o suscribirse:", error);
@@ -96,6 +95,7 @@ const ChatDuo = ({ userProps }) => {
 
   async function createOrFindDuoRoom(user1, user2) {
     try {
+      // let members = [userLogged, userSelected];
       let members = [user1, user2];
 
       let objectData = {
@@ -121,6 +121,8 @@ const ChatDuo = ({ userProps }) => {
       );
 
       const result = await response.json();
+      console.log('result: ', result);
+      
       const chatroomId = result.result.data.chatroom.objectId;
 
       // Aquí seteamos el roomId una vez que lo obtengamos
@@ -160,16 +162,20 @@ const ChatDuo = ({ userProps }) => {
   }
 
   async function sendMessage() {
-    const ChatMessage = Parse.Object.extend("chatMessage");
-    const message = new ChatMessage();
+    try {
+      const ChatMessage = Parse.Object.extend("chatMessage");
+      const message = new ChatMessage();
 
-    message.set("content", newMessage);
-    message.set("clientId", userLogged);
-    message.set("chatroomId", roomId);
-    message.save().catch((error) => {
-      console.log("Error al enviar mensaje: ", error);
-    });
-    setNewMessage("");
+      message.set("content", newMessage);
+      message.set("clientId", userLogged);
+      message.set("chatroomId", roomId);
+      message.save().catch((error) => {
+        console.log("Error al enviar mensaje: ", error);
+      });
+      setNewMessage("");
+    } catch (error) {
+      console.log('error en el contraoldor sendMessage: ', error);
+    }
   }
 
   return (
@@ -187,7 +193,9 @@ const ChatDuo = ({ userProps }) => {
           className="bg-primary text-white p-3 rounded-top text-center"
           style={{ cursor: "pointer" }}
         >
-          <h5 className="mb-0">Chat Duo: {userProps ? userProps.username : ""}</h5>
+          <h5 className="mb-0">
+            Chat Duo: {userProps ? userProps.username : ""}
+          </h5>
         </div>
         <div
           className="flex-grow-1 p-3"
@@ -199,11 +207,14 @@ const ChatDuo = ({ userProps }) => {
         >
           {allMessages &&
             allMessages.map((msg, index) => (
-              <div key={index} className={`d-flex mb-2 ${
-                msg.clientId === userLogged
-                  ? "justify-content-end"
-                  : "justify-content-start"
-              }`} >
+              <div
+                key={index}
+                className={`d-flex mb-2 ${
+                  msg.clientId === userLogged
+                    ? "justify-content-end"
+                    : "justify-content-start"
+                }`}
+              >
                 <div
                   className={`p-2 rounded-3 ${
                     msg.clientId === userLogged
@@ -212,7 +223,12 @@ const ChatDuo = ({ userProps }) => {
                   }`}
                   style={{ maxWidth: "75%", wordBreak: "break-word" }}
                 >
-                  <strong>  {userLogged == msg.clientId ? 'Tú' : userProps.username}: </strong>
+                  <strong>
+                    {" "}
+                    {userLogged == msg.clientId
+                      ? "Tú"
+                      : userProps.username}:{" "}
+                  </strong>
                   <p className="mb-0">{msg.content}</p>
                 </div>
               </div>
