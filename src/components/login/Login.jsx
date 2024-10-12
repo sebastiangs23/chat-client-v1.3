@@ -11,7 +11,7 @@ export function Login() {
   async function signIn() {
     try {
       let data = {
-        username: username,
+        email: username,
         password: password,
       };
 
@@ -20,7 +20,7 @@ export function Login() {
         headers: {
           "Content-Type": "application/json",
           "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
-          "X-Parse-Application-Id": "000",
+          "X-Parse-Application-Id": "083",
         },
         body: JSON.stringify(data),
       });
@@ -36,7 +36,7 @@ export function Login() {
         loginUser(userData);
         // También guardamos los datos en sessionStorage para persistencia
         localStorage.setItem("user", JSON.stringify(userData));
-        navigate("/create-chatroom"); // Redirigimos al crear chatroom
+        navigate("/market-place"); // Redirigimos al crear chatroom
       } else {
         alert("Credenciales incorrectas");
       }
@@ -52,14 +52,14 @@ export function Login() {
           <h1 class="text-center mb-4">LOGIN</h1>
           <div class="mb-3">
             <label for="username" class="form-label h5">
-              Usuario
+              email
             </label>
             <input
               type="text"
               id="username"
               class="form-control"
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Ingresa tu usuario"
+              placeholder="Ingresa tu email"
             />
           </div>
           <div class="mb-3">

@@ -21,7 +21,7 @@ const App = () => {
           <Route path="/join-chat" element={<JoinChat />} />
           <Route path="/create-chatroom" element={<ProtectedCreateChatroom />} />
           <Route path="/market-place" element={<MarketPlace />} />
-          <Route path="/" element={<Navigate to="/join-chat" />} />
+          <Route path="/" element={<Navigate to="/login" />} />
         </Routes>
       </Router>
     </UserProvider>

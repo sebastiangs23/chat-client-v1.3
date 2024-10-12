@@ -32,47 +32,19 @@ export function MarketPlace() {
 
       let response = [
         {
-          objectId : "94c56DabuS",
-          username : "sebass",
+          objectId : "Mermncj2FS",
+          username : "catanio",
           _hashed_password : "$2y$10$obM66PXjDc9n2dVXddx4nub/T8kzCRbwYHOjfqS6kGFOvH3uYs5W2",
           _wperm : [
               "94c56DabuS"
           ],
           user_chatrooms : [
-              {
-                  chatroomId : "JO4p3ny7MM",
-                  members : [
-                      "94c56DabuS",
-                      "gqQfIsKm1F"
-                  ]
-              },
-              {
-                  chatroomId : "tjqRBq8x7s",
-                  members : [
-                      "94c56DabuS",
-                      "gqQfIsKm1F"
-                  ]
-              }
           ]
       },
       {
-          objectId : "gqQfIsKm1F",
-          username : "testeo",
+          objectId : "iCHWTvEFYG",
+          username : "daniel",
           user_chatrooms : [
-              {
-                  chatroomId : "5F24Vdso8A",
-                  members : [
-                      "gqQfIsKm1F",
-                      "hEFCcRgbmz"
-                  ]
-              },
-              {
-                  "chatroomId" : "i0yxQeYrnW",
-                  "members" : [
-                      "gqQfIsKm1F",
-                      "hEFCcRgbmz"
-                  ]
-              },
           ]
       }
       ]
