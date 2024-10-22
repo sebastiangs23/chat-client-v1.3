@@ -101,7 +101,6 @@ const ChatDuo = ({ userProps }) => {
       let data = {
         objectData: {
           members,
-          productId: "123456789"
         }
       };
 

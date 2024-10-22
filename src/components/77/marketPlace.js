@@ -85,7 +85,7 @@ export function MarketPlace() {
       <div className="flex-grow-1 p-3">
         <h1>Bienvenido al MarketPlace</h1>
 
-        {selectedUser != null ? <ChatDuo /> : <h2>Seleccion un usuario</h2>}
+        {selectedUser != null ? <ChatDuo userProps={"Yo"} /> : <h2>Seleccion un usuario</h2>}
       </div>
     </div>
   );
