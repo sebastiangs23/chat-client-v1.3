@@ -96,7 +96,7 @@ const ChatDuo = ({ userProps }) => {
   async function createOrFindDuoRoom(user1, user2) {
     try {
       // let members = [userLogged, userSelected];
-      let members = [user1, user2];
+      let members = ["JwxBO6Zw4D", "xzyKh4HUqT"];
 
       let objectData = {
         members,
