@@ -17,8 +17,8 @@ const ChatDuo = ({ userProps }) => {
   // Este useEffect crea o encuentra la sala
   useEffect(() => {
     const initializeChatRoom = async () => {
-      const user1 = "Odp8QLsRKf"; //test
-      const user2 = "AJuqmfGuBZ"; //test2
+      const user1 = "M5xXaVoeLC"; //tes2
+      const user2 = "zHr45CAaRd"; //test
 
       console.log("user1: ", user1);
       console.log("user2 ", user2);
@@ -57,6 +57,7 @@ const ChatDuo = ({ userProps }) => {
             .map((message) => ({
               content: message.get("content"),
               clientId: message.get("clientId"),
+              sessionToken: message.get("sessionToken"),
               chatroomId: message.get("chatroomId"),
               createdAt: message.get("createdAt"),
             }));
@@ -72,6 +73,7 @@ const ChatDuo = ({ userProps }) => {
           const newMsg = {
             content: message.get("content"),
             clientId: message.get("clientId"),
+            sessionToken: message.get("sessionToken"),
             chatroomId: message.get("chatroomId"),
             createdAt: message.get("createdAt"),
           };
@@ -100,6 +102,7 @@ const ChatDuo = ({ userProps }) => {
 
       let objectData = {
         members,
+        productId: "eFelkGUQnh"
       };
 
       let data = {
@@ -117,7 +120,7 @@ const ChatDuo = ({ userProps }) => {
           headers: {
             "Content-Type": "application/json",
             "X-Parse-Application-Id": "077",
-            "X-Parse-REST-API-Key": "r:75f28041082ed88222a781007d97607d", // hacerlo dinámico
+            "X-Parse-REST-API-Key": "r:a0f16a9350ad838dec8383cfe8dd2204", // hacerlo dinámico
           },
           body: JSON.stringify(data),
         }
@@ -135,34 +138,34 @@ const ChatDuo = ({ userProps }) => {
     }
   }
 
-  async function findUserByName(name) {
-    try {
-      let data = {
-        userName: name,
-      };
+  // async function findUserByName(name) {
+  //   try {
+  //     let data = {
+  //       userName: name,
+  //     };
 
-      const response = await fetch(
-        `http://localhost:2337/server/functions/getUserByUserName`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Parse-Application-Id": "000",
-            "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+  //     const response = await fetch(
+  //       `http://localhost:2337/server/functions/getUserByUserName`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           "X-Parse-Application-Id": "077",
+  //           "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
+  //         },
+  //         body: JSON.stringify(data),
+  //       }
+  //     );
 
-      const result = await response.json();
+  //     const result = await response.json();
 
-      console.log(result.result.user.objectId);
+  //     console.log(result.result.user.objectId);
 
-      return result.result.user.objectId;
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  //     return result.result.user.objectId;
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
 
   async function sendMessage() {
     try {
@@ -172,6 +175,7 @@ const ChatDuo = ({ userProps }) => {
       message.set("content", newMessage);
       message.set("clientId", userLogged);
       message.set("chatroomId", roomId);
+      message.set("sessionToken", "r:bbff89e0e14ae7de105b5b8142460164")
       message.save().catch((error) => {
         console.log("Error al enviar mensaje: ", error);
       });

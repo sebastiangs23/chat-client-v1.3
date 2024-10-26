@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import Parse from "parse";
 import { useUser } from "../context/UserContext";
 
-Parse.initialize("000");
+Parse.initialize("077");
 Parse.serverURL = "http://localhost:2337/server";
 // const sessionToken = "r:220a7f6a212a581d7d9401fd6446330c";
 
@@ -58,6 +58,7 @@ const ChatDuo = ({ userProps }) => {
               content: message.get("content"),
               clientId: message.get("clientId"),
               chatroomId: message.get("chatroomId"),
+              sessionToken: message.get("sessionToken"),
               createdAt: message.get("createdAt"),
             }));
 
@@ -72,6 +73,7 @@ const ChatDuo = ({ userProps }) => {
           const newMsg = {
             content: message.get("content"),
             clientId: message.get("clientId"),
+            sessionToken: message.get("sessionToken"),
             chatroomId: message.get("chatroomId"),
             createdAt: message.get("createdAt"),
           };
@@ -113,7 +115,7 @@ const ChatDuo = ({ userProps }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Parse-Application-Id": "000",
+            "X-Parse-Application-Id": "077",
             "X-Parse-REST-API-Key": "r:06673cb764f52af0f7221e15945e6376", // hacerlo dinámico
           },
           body: JSON.stringify(data),
@@ -144,7 +146,7 @@ const ChatDuo = ({ userProps }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Parse-Application-Id": "000",
+            "X-Parse-Application-Id": "077",
             "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
           },
           body: JSON.stringify(data),
@@ -169,9 +171,15 @@ const ChatDuo = ({ userProps }) => {
       message.set("content", newMessage);
       message.set("clientId", userLogged);
       message.set("chatroomId", roomId);
+      message.set("sessionToken", "r:e57913384544137232fee44688b7cb6b")
       message.save().catch((error) => {
         console.log("Error al enviar mensaje: ", error);
       });
+
+      console.log('messasgeeee', message);
+      console.log(' se mando el mensaje');
+      
+      
       setNewMessage("");
     } catch (error) {
       console.log('error en el contraoldor sendMessage: ', error);

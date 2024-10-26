@@ -36,7 +36,7 @@ const CreateChatroom = () => {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "X-Parse-Application-Id": "000",
+              "X-Parse-Application-Id": "077",
               "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
               // "X-Parse-Session-Token": user.sessionToken,
             },
@@ -64,7 +64,7 @@ const CreateChatroom = () => {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
-                    "X-Parse-Application-Id": "000",
+                    "X-Parse-Application-Id": "077",
                     "X-Parse-REST-API-Key":
                       "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
                     // "X-Parse-Session-Token": "r:ef7df36bf16e16d8b9c4e3d6665f5dba",
@@ -139,7 +139,7 @@ const CreateChatroom = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Parse-Application-Id": "000",
+            "X-Parse-Application-Id": "077",
             "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
             "X-Parse-Session-Token": user.sessionToken,
           },
