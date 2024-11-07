@@ -1,7 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import Parse from "parse";
+import 'dotenv/config'
 
-// Parse.initialize("077");
+console.log('AAAAAA', process.env)
+
 Parse.initialize("026");
 Parse.serverURL = "http://localhost:2337/server";
 // const sessionToken = "r:220a7f6a212a581d7d9401fd6446330c";
@@ -17,8 +19,8 @@ const ChatDuo = ({ userProps }) => {
   // Este useEffect crea o encuentra la sala
   useEffect(() => {
     const initializeChatRoom = async () => {
-      const user1 = "iCHWTvEFYG"; //test
-      const user2 = "Mermncj2FS"; //test2
+      const user1 = "F7YCjUfoT1"; //test
+      const user2 = "lR5CWue9sZ"; //test2
 
       console.log("user1: ", user1);
       console.log("user2 ", user2);
@@ -115,7 +117,7 @@ const ChatDuo = ({ userProps }) => {
           headers: {
             "Content-Type": "application/json",
             "X-Parse-Application-Id": "026",
-            "X-Parse-REST-API-Key": "r:ffed62792e64fead5965bcee3d1e51d3", // hacerlo dinámico
+            "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0", // hacerlo dinámico
           },
           body: JSON.stringify(data),
         }
@@ -145,7 +147,7 @@ const ChatDuo = ({ userProps }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Parse-Application-Id": "000",
+            "X-Parse-Application-Id": "026",
             "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
           },
           body: JSON.stringify(data),

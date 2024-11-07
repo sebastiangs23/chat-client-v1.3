@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useUser } from "../context/UserContext";
-import { useNavigate } from "react-router-dom"; // Importa useNavigate
+import { useNavigate } from "react-router-dom";
 import io from "socket.io-client";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Chat.css";

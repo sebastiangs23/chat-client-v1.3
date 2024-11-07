@@ -2,9 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import Parse from "parse";
 import { useUser } from "../context/UserContext";
 
-Parse.initialize("000");
+Parse.initialize("026");
 Parse.serverURL = "http://localhost:2337/server";
-// const sessionToken = "r:220a7f6a212a581d7d9401fd6446330c";
 
 const ChatDuo = ({ userProps }) => {
   const [newMessage, setNewMessage] = useState([]);
@@ -96,7 +95,7 @@ const ChatDuo = ({ userProps }) => {
   async function createOrFindDuoRoom(user1, user2) {
     try {
       // let members = [userLogged, userSelected];
-      let members = ["JwxBO6Zw4D", "xzyKh4HUqT"];
+      let members = ["JwxBO6Zw4D", "enzuqVaido"];
 
       let objectData = {
         members,

@@ -49,7 +49,7 @@ export function Login() {
     <div class="container mt-5">
       <div class="row justify-content-center">
         <div class="col-md-4">
-          <h1 class="text-center mb-4">LOGIN</h1>
+          <h1 class="text-center mb-4">LOGIN OF THE PROJECT ''</h1>
           <div class="mb-3">
             <label for="username" class="form-label h5">
               email

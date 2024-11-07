@@ -32,8 +32,8 @@ export function MarketPlace() {
 
       let response = [
         {
-          objectId : "Mermncj2FS",
-          username : "catanio",
+          objectId : "F7YCjUfoT1",
+          username : "F7YCjUfoT1",
           _hashed_password : "$2y$10$obM66PXjDc9n2dVXddx4nub/T8kzCRbwYHOjfqS6kGFOvH3uYs5W2",
           _wperm : [
               "94c56DabuS"
@@ -42,8 +42,8 @@ export function MarketPlace() {
           ]
       },
       {
-          objectId : "iCHWTvEFYG",
-          username : "daniel",
+          objectId : "lR5CWue9sZ",
+          username : "lR5CWue9sZ",
           user_chatrooms : [
           ]
       }
