@@ -11,7 +11,7 @@ export function Login() {
   async function signIn() {
     try {
       let data = {
-        email: username,
+        username: username,
         password: password,
       };
 
@@ -20,23 +20,25 @@ export function Login() {
         headers: {
           "Content-Type": "application/json",
           "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
-          "X-Parse-Application-Id": "026",
+          "X-Parse-Application-Id": "008",
         },
         body: JSON.stringify(data),
       });
 
       let result = await response.json();
-
+      console.log('resullllt', result);
+      
       if (result && result.sessionToken) {
         // Guardamos el username y el token en el contexto
         const userData = {
+          objectId: result.objectId,
           username: result.username,
           sessionToken: result.sessionToken,
         };
         loginUser(userData);
         // También guardamos los datos en sessionStorage para persistencia
-        localStorage.setItem("user", JSON.stringify(userData));
-        navigate("/market-place"); // Redirigimos al crear chatroom
+        localStorage.setItem("user", JSON.stringify(userData))
+        navigate("/market-place")
       } else {
         alert("Credenciales incorrectas");
       }

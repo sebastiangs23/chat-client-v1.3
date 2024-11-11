@@ -16,12 +16,12 @@ export const UserProvider = ({ children }) => {
     }, []);
 
   const loginUser = (userData) => {
-    sessionStorage.setItem('user', JSON.stringify(userData)); // Asegúrate de guardar el usuario en sessionStorage
+    sessionStorage.setItem('user', JSON.stringify(userData)); 
     setUser(userData);
   };
 
   const logoutUser = () => {
-    sessionStorage.removeItem("user"); // Elimina el usuario de sessionStorage al cerrar sesión
+    sessionStorage.removeItem("user");
     setUser(null);
   };
 

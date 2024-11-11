@@ -5,9 +5,7 @@ import io from "socket.io-client";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Modal, Button } from "react-bootstrap";
 import ChatDuo from "./ChatDuo.js";
-//import ChatDuo from "./77/chatDuo.js";
 
-// Componente para mostrar la información del grupo
 const GroupInfoModal = ({ show, handleClose, groupName, chatroomId }) => {
   const [groupLink, setGroupLink] = useState(null);
 

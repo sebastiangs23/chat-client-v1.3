@@ -1,14 +1,10 @@
 import { useEffect, useState, useRef } from "react";
 import Parse from "parse";
-import 'dotenv/config'
 
-console.log('AAAAAA', process.env)
-
-Parse.initialize("026");
+Parse.initialize("008");
 Parse.serverURL = "http://localhost:2337/server";
-// const sessionToken = "r:220a7f6a212a581d7d9401fd6446330c";
 
-const ChatDuo = ({ userProps }) => {
+const ChatDuo = ({ userSelected }) => {
   const [newMessage, setNewMessage] = useState([]);
   const [allMessages, setAllMessages] = useState([]);
   const [roomId, setRoomId] = useState("");
@@ -19,23 +15,15 @@ const ChatDuo = ({ userProps }) => {
   // Este useEffect crea o encuentra la sala
   useEffect(() => {
     const initializeChatRoom = async () => {
-      const user1 = "F7YCjUfoT1"; //test
-      const user2 = "lR5CWue9sZ"; //test2
 
-      console.log("user1: ", user1);
-      console.log("user2 ", user2);
+      const storedUser = localStorage.getItem("user");
+      const userParsed = JSON.parse(storedUser);
 
-      // const user1 = await findUserByName(userProps.username);
-      // const storedUser = localStorage.getItem("user");
-      // const userParsed = JSON.parse(storedUser);
-      // const user2 = await findUserByName(userParsed.username);
-
-      // console.log('users: ', user1, user2);
+      console.log('userSelected', userSelected);
+      console.log('userParsed', userParsed.objectId);
       
-
-      setUserLogged(user2);
-
-      createOrFindDuoRoom(user1, user2);
+      setUserLogged(userParsed.objectId)
+      createOrFindDuoRoom(userParsed.objectId, userSelected.objectId);
     };
 
     initializeChatRoom();
@@ -106,17 +94,13 @@ const ChatDuo = ({ userProps }) => {
         }
       };
 
-      console.log('este data?', data);
-      
-
-      // Crea o encuentra la sala
       const response = await fetch(
         `http://localhost:2337/server/functions/createChatroom`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Parse-Application-Id": "026",
+            "X-Parse-Application-Id": "008",
             "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0", // hacerlo dinámico
           },
           body: JSON.stringify(data),
@@ -125,9 +109,6 @@ const ChatDuo = ({ userProps }) => {
 
       const result = await response.json();
       const chatroomId = result.result.data.chatroom.objectId;
-
-      // Aquí seteamos el roomId una vez que lo obtengamos
-      console.log("chatroomdId", chatroomId);
 
       setRoomId(chatroomId);
     } catch (error) {
@@ -147,7 +128,7 @@ const ChatDuo = ({ userProps }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Parse-Application-Id": "026",
+            "X-Parse-Application-Id": "008",
             "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
           },
           body: JSON.stringify(data),
@@ -197,7 +178,7 @@ const ChatDuo = ({ userProps }) => {
           style={{ cursor: "pointer" }}
         >
           <h5 className="mb-0">
-            Chat Duo: {userProps ? userProps.username : ""}
+            Chat Duo: {userSelected ? userSelected.username : ""}
           </h5>
         </div>
         <div
@@ -230,7 +211,7 @@ const ChatDuo = ({ userProps }) => {
                     {" "}
                     {userLogged == msg.clientId
                       ? "Tú"
-                      : userProps.username}:{" "}
+                      : userSelected.username}:{" "}
                   </strong>
                   <p className="mb-0">{msg.content}</p>
                 </div>
