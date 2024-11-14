@@ -34,6 +34,7 @@ export function Login() {
           objectId: result.objectId,
           username: result.username,
           sessionToken: result.sessionToken,
+          companyId: result.companyId.objectId
         };
         loginUser(userData);
         // También guardamos los datos en sessionStorage para persistencia

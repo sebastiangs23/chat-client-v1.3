@@ -4,7 +4,7 @@ import Parse from "parse";
 Parse.initialize("008");
 Parse.serverURL = "http://localhost:2337/server";
 
-const ChatDuo = ({ userSelected }) => {
+const ChatDuo = ({ companySelected }) => {
   const [newMessage, setNewMessage] = useState([]);
   const [allMessages, setAllMessages] = useState([]);
   const [roomId, setRoomId] = useState("");
@@ -19,11 +19,12 @@ const ChatDuo = ({ userSelected }) => {
       const storedUser = localStorage.getItem("user");
       const userParsed = JSON.parse(storedUser);
 
-      console.log('userSelected', userSelected);
+      console.log('companySelected', companySelected);
       console.log('userParsed', userParsed.objectId);
       
-      setUserLogged(userParsed.objectId)
-      createOrFindDuoRoom(userParsed.objectId, userSelected.objectId);
+      setUserLogged(userParsed.companyId)
+
+      createOrFindDuoRoom(userParsed.companyId, companySelected.objectId); //companySelected.objectId ahora es la compañia con la que voy a crear un chat
     };
 
     initializeChatRoom();
@@ -46,7 +47,7 @@ const ChatDuo = ({ userSelected }) => {
             .filter((message) => message.get("content") !== "")
             .map((message) => ({
               content: message.get("content"),
-              clientId: message.get("clientId"),
+              companyId: message.get("companyId"),
               chatroomId: message.get("chatroomId"),
               createdAt: message.get("createdAt"),
             }));
@@ -61,7 +62,7 @@ const ChatDuo = ({ userSelected }) => {
         subscriptionMessage.on("create", (message) => {
           const newMsg = {
             content: message.get("content"),
-            clientId: message.get("clientId"),
+            companyId: message.get("companyId"),
             chatroomId: message.get("chatroomId"),
             createdAt: message.get("createdAt"),
           };
@@ -116,42 +117,13 @@ const ChatDuo = ({ userSelected }) => {
     }
   }
 
-  async function findUserByName(name) {
-    try {
-      let data = {
-        userName: name,
-      };
-
-      const response = await fetch(
-        `http://localhost:2337/server/functions/getUserByUserName`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Parse-Application-Id": "008",
-            "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
-          },
-          body: JSON.stringify(data),
-        }
-      );
-
-      const result = await response.json();
-
-      console.log(result.result.user.objectId);
-
-      return result.result.user.objectId;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   async function sendMessage() {
     try {
       const ChatMessage = Parse.Object.extend("chatMessage");
       const message = new ChatMessage();
 
       message.set("content", newMessage);
-      message.set("clientId", userLogged);
+      message.set("companyId", userLogged);
       message.set("chatroomId", roomId);
       message.save().catch((error) => {
         console.log("Error al enviar mensaje: ", error);
@@ -178,7 +150,7 @@ const ChatDuo = ({ userSelected }) => {
           style={{ cursor: "pointer" }}
         >
           <h5 className="mb-0">
-            Chat Duo: {userSelected ? userSelected.username : ""}
+            Chat Duo: {companySelected ? companySelected.name : ""}
           </h5>
         </div>
         <div
@@ -194,14 +166,14 @@ const ChatDuo = ({ userSelected }) => {
               <div
                 key={index}
                 className={`d-flex mb-2 ${
-                  msg.clientId === userLogged
+                  msg.companyId === userLogged
                     ? "justify-content-end"
                     : "justify-content-start"
                 }`}
               >
                 <div
                   className={`p-2 rounded-3 ${
-                    msg.clientId === userLogged
+                    msg.companyId === userLogged
                       ? "bg-primary text-white"
                       : "bg-light text-dark"
                   }`}
@@ -209,9 +181,9 @@ const ChatDuo = ({ userSelected }) => {
                 >
                   <strong>
                     {" "}
-                    {userLogged == msg.clientId
+                    {userLogged == msg.companyId
                       ? "Tú"
-                      : userSelected.username}:{" "}
+                      : companySelected.name}:{" "}
                   </strong>
                   <p className="mb-0">{msg.content}</p>
                 </div>
