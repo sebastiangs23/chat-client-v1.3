@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import Parse from "parse";
+import axios from "axios";
 
 Parse.initialize("008");
 Parse.serverURL = "http://localhost:2337/server";
@@ -15,14 +16,13 @@ const ChatDuo = ({ companySelected }) => {
   // Este useEffect crea o encuentra la sala
   useEffect(() => {
     const initializeChatRoom = async () => {
-
       const storedUser = localStorage.getItem("user");
       const userParsed = JSON.parse(storedUser);
 
-      console.log('companySelected', companySelected);
-      console.log('userParsed', userParsed.objectId);
-      
-      setUserLogged(userParsed.companyId)
+      console.log("companySelected", companySelected);
+      console.log("userParsed", userParsed.objectId);
+
+      setUserLogged(userParsed.companyId);
 
       createOrFindDuoRoom(userParsed.companyId, companySelected.objectId); //companySelected.objectId ahora es la compañia con la que voy a crear un chat
     };
@@ -92,7 +92,7 @@ const ChatDuo = ({ companySelected }) => {
       let data = {
         objectData: {
           members,
-        }
+        },
       };
 
       const response = await fetch(
@@ -134,8 +134,41 @@ const ChatDuo = ({ companySelected }) => {
     }
   }
 
+  async function createAlliance() {
+    try {
+      const storedUser = localStorage.getItem("user");
+      const userParsed = JSON.parse(storedUser);
+
+      const allCompaniesId = [userParsed.companyId, companySelected.objectId];
+
+      const response = await axios.post(
+        `http://localhost:2337/server/functions/createAlliance`,
+        {
+          objectData: {
+            name: "Alianza de test",
+            allCompaniesId,
+          },
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "X-Parse-Application-Id": "008",
+            "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
+          },
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <div>
+      <div class="p-3 d-flex justify-content-center">
+        <button class="btn btn-success" onClick={() => createAlliance()}>
+          Crear alianza{" "}
+        </button>
+      </div>
       <div
         className="container mt-3 d-flex flex-column"
         style={{
