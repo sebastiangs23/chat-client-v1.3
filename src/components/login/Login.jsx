@@ -11,7 +11,7 @@ export function Login() {
   async function signIn() {
     try {
       let data = {
-        email: username,
+        username: username,
         password: password,
       };
 
@@ -20,7 +20,7 @@ export function Login() {
         headers: {
           "Content-Type": "application/json",
           "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
-          "X-Parse-Application-Id": "083",
+          "X-Parse-Application-Id": "092",
         },
         body: JSON.stringify(data),
       });

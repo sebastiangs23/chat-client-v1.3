@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import Parse from "parse";
 import { useUser } from "../context/UserContext";
 
-Parse.initialize("000");
+Parse.initialize("092", "r:0acbe33d79ac68d743ef2a5406a9cd92");
 Parse.serverURL = "http://localhost:2337/server";
 // const sessionToken = "r:220a7f6a212a581d7d9401fd6446330c";
 
@@ -113,7 +113,7 @@ const ChatDuo = ({ userProps }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Parse-Application-Id": "000",
+            "X-Parse-Application-Id": "092",
             "X-Parse-REST-API-Key": "r:06673cb764f52af0f7221e15945e6376", // hacerlo dinámico
           },
           body: JSON.stringify(data),
@@ -144,7 +144,7 @@ const ChatDuo = ({ userProps }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Parse-Application-Id": "000",
+            "X-Parse-Application-Id": "092",
             "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
           },
           body: JSON.stringify(data),
