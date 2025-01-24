@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import Parse from "parse";
 
 // Parse.initialize("077");
-Parse.initialize("092", "r:0acbe33d79ac68d743ef2a5406a9cd92");
+Parse.initialize("106", "r:0acbe33d79ac68d743ef2a5406a9cd92");
 Parse.serverURL = "http://localhost:2337/server";
 // const sessionToken = "r:220a7f6a212a581d7d9401fd6446330c";
 
@@ -22,14 +22,6 @@ const ChatDuo = ({ userProps }) => {
 
       console.log("user1: ", user1);
       console.log("user2 ", user2);
-
-      // const user1 = await findUserByName(userProps.username);
-      // const storedUser = localStorage.getItem("user");
-      // const userParsed = JSON.parse(storedUser);
-      // const user2 = await findUserByName(userParsed.username);
-
-      // console.log('users: ', user1, user2);
-      
 
       setUserLogged(user2);
 
@@ -104,9 +96,6 @@ const ChatDuo = ({ userProps }) => {
         }
       };
 
-      console.log('este data?', data);
-      
-
       // Crea o encuentra la sala
       const response = await fetch(
         `http://localhost:2337/server/functions/createChatroom`,
@@ -114,7 +103,7 @@ const ChatDuo = ({ userProps }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Parse-Application-Id": "092",
+            "X-Parse-Application-Id": "106",
             "X-Parse-REST-API-Key": "r:ffed62792e64fead5965bcee3d1e51d3", // hacerlo dinámico
           },
           body: JSON.stringify(data),
@@ -125,40 +114,10 @@ const ChatDuo = ({ userProps }) => {
       const chatroomId = result.result.data.chatroom.objectId;
 
       // Aquí seteamos el roomId una vez que lo obtengamos
-      console.log("chatroomdId", chatroomId);
 
       setRoomId(chatroomId);
     } catch (error) {
       console.log("Error creando o encontrando la sala:", error);
-    }
-  }
-
-  async function findUserByName(name) {
-    try {
-      let data = {
-        userName: name,
-      };
-
-      const response = await fetch(
-        `http://localhost:2337/server/functions/getUserByUserName`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Parse-Application-Id": "092",
-            "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
-          },
-          body: JSON.stringify(data),
-        }
-      );
-
-      const result = await response.json();
-
-      console.log(result.result.user.objectId);
-
-      return result.result.user.objectId;
-    } catch (error) {
-      console.log(error);
     }
   }
 
