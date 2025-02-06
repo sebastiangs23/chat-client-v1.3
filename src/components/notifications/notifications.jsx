@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import Parse from "parse";
 
-Parse.initialize("106", "r:2060274cdd42ec44c7d924766fd12e0f");
+Parse.initialize("087", "r:2060274cdd42ec44c7d924766fd12e0f");
 Parse.serverURL = "http://localhost:2337/server";
 
 export default function Notifications() {

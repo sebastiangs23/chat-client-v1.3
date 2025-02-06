@@ -9,7 +9,7 @@ const CreateChatroom = () => {
   const { user } = useUser();
   const navigate = useNavigate(); // Usa useNavigate para redirigir
   const [chatroomName, setChatroomName] = useState("");
-  const [chatroomId, setChatroomId] = useState(null);
+  const [chatRoomId, setChatroomId] = useState(null);
   const [chatVisible, setChatVisible] = useState(false);
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
@@ -154,14 +154,14 @@ const CreateChatroom = () => {
       const responseData = await response.json();
       console.log("Chatroom creation response:", responseData);
 
-      const { chatroomId, link, members, username } = responseData.result.data;
-      setChatroomId(chatroomId);
+      const { chatRoomId, link, members, username } = responseData.result.data;
+      setChatroomId(chatRoomId);
       setChatVisible(true);
       // setUsername(username);
 
-      socketRef.current.emit("join", chatroomId);
+      socketRef.current.emit("join", chatRoomId);
 
-      console.log("Chatroom ID:", chatroomId);
+      console.log("Chatroom ID:", chatRoomId);
       console.log("Link:", link);
       console.log("Members:", members);
       console.log("Username:", username);
@@ -171,12 +171,12 @@ const CreateChatroom = () => {
   };
 
   const sendMessage = () => {
-    if (message.trim() && socketRef.current && chatroomId) {
+    if (message.trim() && socketRef.current && chatRoomId) {
 
       const msgData = {
         username,
         message: message.trim(),
-        chatroomId,
+        chatRoomId,
         chatroomName: chatroomName,
       };
 
@@ -187,7 +187,7 @@ const CreateChatroom = () => {
     } else {
       console.log("Message not sent. Check conditions:", {
         message,
-        chatroomId,
+        chatRoomId,
       });
     }
   };

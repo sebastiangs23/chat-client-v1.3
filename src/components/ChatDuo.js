@@ -33,7 +33,7 @@ const ChatDuo = ({ userProps }) => {
     initializeChatRoom();
   }, []);
 
-  // Este useEffect se ejecuta cuando `chatroomId` tiene un valor
+  // Este useEffect se ejecuta cuando `chatRoomId` tiene un valor
   useEffect(() => {
     if (!roomId) return;
 
@@ -45,7 +45,7 @@ const ChatDuo = ({ userProps }) => {
         // Crear una conexión con la colección "Chat_Message"
         const ChatMessage = Parse.Object.extend("chatMessage");
         const query = new Parse.Query(ChatMessage);
-        query.equalTo("chatroomId", roomId);
+        query.equalTo("chatRoomId", roomId);
 
         const data = await query.find();
 
@@ -56,8 +56,8 @@ const ChatDuo = ({ userProps }) => {
             .filter((message) => message.get("content") !== "")
             .map((message) => ({
               content: message.get("content"),
-              clientId: message.get("clientId"),
-              chatroomId: message.get("chatroomId"),
+              userId: message.get("userId"),
+              chatRoomId: message.get("chatRoomId"),
               createdAt: message.get("createdAt"),
             }));
 
@@ -71,8 +71,8 @@ const ChatDuo = ({ userProps }) => {
         subscriptionMessage.on("create", (message) => {
           const newMsg = {
             content: message.get("content"),
-            clientId: message.get("clientId"),
-            chatroomId: message.get("chatroomId"),
+            userId: message.get("userId"),
+            chatRoomId: message.get("chatRoomId"),
             createdAt: message.get("createdAt"),
           };
 
@@ -123,10 +123,10 @@ const ChatDuo = ({ userProps }) => {
       const result = await response.json();
       console.log('result: ', result);
       
-      const chatroomId = result.result.data.chatroom.objectId;
+      const chatRoomId = result.result.data.chatroom.objectId;
 
       // Aquí seteamos el roomId una vez que lo obtengamos
-      setRoomId(chatroomId);
+      setRoomId(chatRoomId);
     } catch (error) {
       console.log("Error creando o encontrando la sala:", error);
     }
@@ -163,21 +163,26 @@ const ChatDuo = ({ userProps }) => {
 
   async function sendMessage() {
     try {
+      if (!userLogged || !roomId) {
+        console.log("Error: userLogged o roomId no están definidos.");
+        return;
+      }
+  
+      // Crear un nuevo mensaje en chatMessage
       const ChatMessage = Parse.Object.extend("chatMessage");
       const message = new ChatMessage();
-
       message.set("content", newMessage);
-      message.set("clientId", userLogged);
-      message.set("chatroomId", roomId);
-      message.save().catch((error) => {
-        console.log("Error al enviar mensaje: ", error);
-      });
+      message.set("userId", userLogged);
+      message.set("chatRoomId", roomId);
+      await message.save();
+
       setNewMessage("");
+      console.log("Mensaje enviado con éxito.");
+  
     } catch (error) {
-      console.log('error en el contraoldor sendMessage: ', error);
+      console.log("Error en el controlador sendMessage: ", error);
     }
   }
-
   return (
     <div>
       <div
@@ -210,14 +215,14 @@ const ChatDuo = ({ userProps }) => {
               <div
                 key={index}
                 className={`d-flex mb-2 ${
-                  msg.clientId === userLogged
+                  msg.userId === userLogged
                     ? "justify-content-end"
                     : "justify-content-start"
                 }`}
               >
                 <div
                   className={`p-2 rounded-3 ${
-                    msg.clientId === userLogged
+                    msg.userId === userLogged
                       ? "bg-primary text-white"
                       : "bg-light text-dark"
                   }`}
@@ -225,7 +230,7 @@ const ChatDuo = ({ userProps }) => {
                 >
                   <strong>
                     {" "}
-                    {userLogged == msg.clientId
+                    {userLogged == msg.userId
                       ? "Tú"
                       : userProps.username}:{" "}
                   </strong>

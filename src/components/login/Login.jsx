@@ -20,7 +20,7 @@ export function Login() {
         headers: {
           "Content-Type": "application/json",
           "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
-          "X-Parse-Application-Id": "106",
+          "X-Parse-Application-Id": "087",
         },
         body: JSON.stringify(data),
       });
@@ -52,7 +52,7 @@ export function Login() {
           <h1 class="text-center mb-4">LOGIN</h1>
           <div class="mb-3">
             <label for="username" class="form-label h5">
-              email
+              username
             </label>
             <input
               type="text"

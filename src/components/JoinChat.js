@@ -8,7 +8,7 @@ import ChatDuo from "./ChatDuo.js";
 //import ChatDuo from "./77/chatDuo.js";
 
 // Componente para mostrar la información del grupo
-const GroupInfoModal = ({ show, handleClose, groupName, chatroomId }) => {
+const GroupInfoModal = ({ show, handleClose, groupName, chatRoomId }) => {
   const [groupLink, setGroupLink] = useState(null);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ const GroupInfoModal = ({ show, handleClose, groupName, chatroomId }) => {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "X-Parse-Application-Id": "106",
+              "X-Parse-Application-Id": "087",
               "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
             },
             body: JSON.stringify(data),
@@ -86,7 +86,7 @@ const JoinChat = () => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [username, setUsername] = useState("");
-  const [chatroomId, setChatroomId] = useState("");
+  const [chatRoomId, setChatRoomId] = useState("");
   const [chatroomName, setChatroomName] = useState("");
   const [showGroupInfo, setShowGroupInfo] = useState(false);
   const [userSelected, setUserSelected] = useState(null);
@@ -114,7 +114,7 @@ const JoinChat = () => {
 
     
     const params = new URLSearchParams(location.search);
-    const id = params.get("chatroomId");
+    const id = params.get("chatRoomId");
     const name = params.get("chatroomName");
 
     if (!id) {
@@ -123,7 +123,7 @@ const JoinChat = () => {
       return;
     }
     
-    setChatroomId(id);
+    setChatRoomId(id);
     setChatroomName(name || "");
 
     const fetchMessages = async () => {
@@ -135,7 +135,7 @@ const JoinChat = () => {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "X-Parse-Application-Id": "106",
+              "X-Parse-Application-Id": "087",
               "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
             },
             body: JSON.stringify(data),
@@ -187,7 +187,7 @@ const JoinChat = () => {
         socketRef.current = null;
       }
     };
-  }, [chatroomId, location, navigate, chatroomName, user]);
+  }, [chatRoomId, location, navigate, chatroomName, user]);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -200,8 +200,8 @@ const JoinChat = () => {
       const msgData = {
         username: username,
         message: message.trim(),
-        chatroomId: chatroomId,
-        chatroomName: chatroomName,
+        chatRoomId: chatRoomId, //pointer a la coleccion 'chatRoom'
+        chatRoomName: chatroomName, 
       };
 
       console.log("user", user);
@@ -298,7 +298,7 @@ const JoinChat = () => {
 
       {userSelected && (
         <div className="container" style={{ width: "700px", marginLeft: "10px" }}>
-          <ChatDuo userProps={userSelected} chatroomId={chatroomId} />
+          <ChatDuo userProps={userSelected} chatRoomId={chatRoomId} />
         </div>
       )} 
     </div>

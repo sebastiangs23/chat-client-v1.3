@@ -32,8 +32,8 @@ export function MarketPlace() {
 
       let response = [
         {
-          objectId : "oAXwvoOaC4",
-          username : "testchat1",
+          objectId : "5P2A8v3e0J",
+          username : "Diegote",
           _hashed_password : "$2y$10$obM66PXjDc9n2dVXddx4nub/T8kzCRbwYHOjfqS6kGFOvH3uYs5W2",
           _wperm : [
               "94c56DabuS"
@@ -42,8 +42,8 @@ export function MarketPlace() {
           ]
       },
       {
-          objectId : "gnLkYCxpo7",
-          username : "testchat2",
+          objectId : "pl1uTjWawM",
+          username : "example123",
           user_chatrooms : [
           ]
       }
@@ -57,9 +57,6 @@ export function MarketPlace() {
 
   function openChat(id) {
     setSelectedUser(id);
-    console.log("id", id);
-
-    console.log("aqui esta mi logica");
   }
 
   return (
