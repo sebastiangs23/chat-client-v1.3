@@ -93,6 +93,7 @@ const ChatDuo = ({ userProps }) => {
       let data = {
         objectData: {
           members,
+          chatType: 'Duo'
         }
       };
 
