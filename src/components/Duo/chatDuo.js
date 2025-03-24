@@ -1,9 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import Parse from "parse";
 
-Parse.initialize("087", "r:0acbe33d79ac68d743ef2a5406a9cd92");
+Parse.initialize("005", "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0");
 Parse.serverURL = "http://localhost:2337/server";
-// const sessionToken = "r:220a7f6a212a581d7d9401fd6446330c";
 
 const ChatDuo = ({ userProps }) => {
   const [newMessage, setNewMessage] = useState([]);
@@ -16,42 +15,38 @@ const ChatDuo = ({ userProps }) => {
   // Este useEffect crea o encuentra la sala
   useEffect(() => {
     const initializeChatRoom = async () => {
-      const user1 = "5P2A8v3e0J"; //diegote
-      const user2 = "pl1uTjWawM"; //example123 
 
-      console.log("user1: ", user1);
-      console.log("user2 ", user2);
+      const user1 = JSON.parse(localStorage.getItem('user')).objectId;
+      const user2 = userProps; 
 
-      setUserLogged(user2);
-
+      setUserLogged(user1);
       createOrFindDuoRoom(user1, user2);
     };
 
     initializeChatRoom();
   }, []);
 
-  // Este useEffect se ejecuta cuando `chatRoomId` tiene un valor
   useEffect(() => {
     if (!roomId) return;
 
     const fetchMessagesAndSubscribe = async () => {
       try {
-        // Crear una conexión con la colección "Chat_Message"
-        const ChatMessage = Parse.Object.extend("chatMessage");
+        // Crear una conexión con la colección "chatMessages"
+        const ChatMessage = Parse.Object.extend("chatMessages");
         const query = new Parse.Query(ChatMessage);
-        query.equalTo("chatRoomId", roomId);
-
+        query.equalTo("chatId", roomId);
         const data = await query.find();
+
         if (data) {
           const messagesHistory = data
-            .filter((message) => message.get("content") !== "")
+            .filter((message) => message.get("chatContent") !== "")
             .map((message) => ({
-              content: message.get("content"),
-              userId: message.get("userId"),
-              chatRoomId: message.get("chatRoomId"),
+              chatContent: message.get("chatContent"),
+              chatClientId: message.get("chatClientId"),
+              chatId: message.get("chatId"),
               createdAt: message.get("createdAt"),
             }));
-
+          
           setAllMessages(messagesHistory);
         }
 
@@ -61,15 +56,14 @@ const ChatDuo = ({ userProps }) => {
         // Escuchar la creación de nuevos mensajes en tiempo real
         subscriptionMessage.on("create", (message) => {
           const newMsg = {
-            content: message.get("content"),
-            userId: message.get("userId"),
-            chatRoomId: message.get("chatRoomId"),
+            chatContent: message.get("chatContent"),
+            chatClientId: message.get("chatClientId"),
+            chatId: message.get("chatId"),
             createdAt: message.get("createdAt"),
           };
 
           // Actualizamos el estado con el nuevo mensaje
           setAllMessages((prevMessages) => [...prevMessages, newMsg]);
-          // setNewMessage((prevState) => [...prevState, newMsg]);
         });
       } catch (error) {
         console.log("Error al obtener los mensajes o suscribirse:", error);
@@ -86,35 +80,35 @@ const ChatDuo = ({ userProps }) => {
   }, [roomId]);
 
   async function createOrFindDuoRoom(user1, user2) {
-
     try {
-      let members = [user1, user2];
+      let chaMembers = [user1, user2];
 
       let data = {
         objectData: {
-          members,
-          chatType: 'Duo'
+          chaMembers,
+          chatDuo: true 
         }
       };
 
       // Crea o encuentra la sala
       const response = await fetch(
-        `http://localhost:2337/server/functions/createChatRoom`,
+        `http://localhost:2337/server/functions/createChats`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Parse-Application-Id": "087",
-            "X-Parse-REST-API-Key": "r:06566d9a56096509553ea443a61a60d0", // hacerlo dinámico
+            "X-Parse-Application-Id": "005",
+            "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
+            "X-Parse-Session-Token": "r:1c596489babc9aacbeea1e65ecb7999a"
+
           },
           body: JSON.stringify(data),
         }
       );
 
-      const result = await response.json();
-      const chatRoomId = result.result.chatRoom.objectId;  
+      const result = await response.json();     
+      const chatRoomId = result.result.chats.chat.objectId;  
 
-      console.log('chatRoomId',  chatRoomId)
       setRoomId(chatRoomId);
     } catch (error) {
       console.log("Error creando o encontrando la sala:", error);
@@ -129,11 +123,11 @@ const ChatDuo = ({ userProps }) => {
       }
   
       // Crear un nuevo mensaje en chatMessage
-      const ChatMessage = Parse.Object.extend("chatMessage");
+      const ChatMessage = Parse.Object.extend("chatMessages");
       const message = new ChatMessage();
-      message.set("content", newMessage);
-      message.set("userId", userLogged);
-      message.set("chatRoomId", roomId);
+      message.set("chatContent", newMessage);
+      message.set("chatClientId", userLogged);
+      message.set("chatId", roomId);
       await message.save();
 
       setNewMessage("");
@@ -160,7 +154,7 @@ const ChatDuo = ({ userProps }) => {
           style={{ cursor: "pointer" }}
         >
           <h5 className="mb-0">
-            Chat Duo: {userProps ? userProps.username : ""}
+            Chat Duo con '{userProps}'
           </h5>
         </div>
         <div
@@ -176,14 +170,14 @@ const ChatDuo = ({ userProps }) => {
               <div
                 key={index}
                 className={`d-flex mb-2 ${
-                  msg.userId === userLogged
+                  msg.chatClientId === userLogged
                     ? "justify-content-end"
                     : "justify-content-start"
                 }`}
               >
                 <div
                   className={`p-2 rounded-3 ${
-                    msg.userId === userLogged
+                    msg.chatClientId === userLogged
                       ? "bg-primary text-white"
                       : "bg-light text-dark"
                   }`}
@@ -191,11 +185,11 @@ const ChatDuo = ({ userProps }) => {
                 >
                   <strong>
                     {" "}
-                    {userLogged == msg.userId
+                    {userLogged == msg.chatClientId
                       ? "Tú"
-                      : userProps.username}:{" "}
+                      : userProps}:{" "}
                   </strong>
-                  <p className="mb-0">{msg.content}</p>
+                  <p className="mb-0">{msg.chatContent}</p>
                 </div>
               </div>
             ))}

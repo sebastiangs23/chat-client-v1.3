@@ -20,7 +20,7 @@ export function Login() {
         headers: {
           "Content-Type": "application/json",
           "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
-          "X-Parse-Application-Id": "087",
+          "X-Parse-Application-Id": "005",
         },
         body: JSON.stringify(data),
       });
@@ -30,13 +30,14 @@ export function Login() {
       if (result && result.sessionToken) {
         // Guardamos el username y el token en el contexto
         const userData = {
+          objectId: result.objectId,
           username: result.username,
           sessionToken: result.sessionToken,
         };
         loginUser(userData);
         // También guardamos los datos en sessionStorage para persistencia
         localStorage.setItem("user", JSON.stringify(userData));
-        navigate("/market-place"); // Redirigimos al crear chatroom
+        navigate("/create-chat-duo"); // Redirigimos al crear chatroom
       } else {
         alert("Credenciales incorrectas");
       }

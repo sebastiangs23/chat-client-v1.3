@@ -25,6 +25,7 @@ const ChatDuo = ({ userProps }) => {
       const userParsed = JSON.parse(storedUser);
 
       const user2 = await findUserByName(userParsed.username);
+      console.log('user2---->', user2)
       setUserLogged(user2);
 
       createOrFindDuoRoom(user1, user2);
@@ -95,11 +96,11 @@ const ChatDuo = ({ userProps }) => {
 
   async function createOrFindDuoRoom(user1, user2) {
     try {
-      // let members = [userLogged, userSelected];
-      let members = [user1, user2];
+      // let chaMembers = [userLogged, userSelected];
+      let chaMembers = [user1, user2];
 
       let objectData = {
-        members,
+        chaMembers,
       };
 
       let data = {
@@ -145,7 +146,7 @@ const ChatDuo = ({ userProps }) => {
           headers: {
             "Content-Type": "application/json",
             "X-Parse-Application-Id": "106",
-            "X-Parse-REST-API-Key": "Yzhl06W5O7Vhf8iwlYBQCxs6hY8Fs2PQewNGjsl0",
+            "X-Parse-REST-API-Key": "r:7a0c83b3f9b2f35151cb4fd31d6e65b7",
           },
           body: JSON.stringify(data),
         }
